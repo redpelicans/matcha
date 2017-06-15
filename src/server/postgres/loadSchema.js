@@ -9,6 +9,6 @@ const query = `CREATE TABLE IF NOT EXISTS users (
 );
 `;
 
-const createTables = ({ db }) => db.query(query).then(() => db);
+const loadSchema = ({ db }) => db.query(query).then(() => db);
 
-export default createTables;
+export default loadSchema;
