@@ -1,0 +1,62 @@
+{
+  "name": "matcha",
+  "version": "0.0.1",
+  "description": "projet matcha 42",
+  "main": "index.js",
+  "repository": "https://github.com/abarriel/matcha.git",
+  "author": "abarriel <abarriel@student.42.fr>",
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint src --color",
+    "srv:dev": "NODE_ENV=development DEBUG=matcha* nodemon --watch config --watch src/server --exec 'babel-node src/server'",
+    "srv:prod": "NODE_ENV=production babel src --out-dir dist/",
+    "srv:run": "NODE_ENV=production DEBUG=sfs*,evtx* node dist/server/cluster",
+    "load:data": "NODE_ENV=development DEBUG=matcha* babel-node ./scripts/load_data",
+    "test": "NODE_ENV=testing DEBUG=matcha* mocha --require babel-core/register --reporter spec \"./src/**/__test__/*.js\" ",
+    "coverage": "NODE_ENV=testing nyc yarn test"
+  },
+  "dependencies": {
+    "axios": "^0.16.2",
+    "body-parser": "^1.17.2",
+    "compression": "^1.6.2",
+    "cookie-parser": "^1.4.3",
+    "debug": "^2.6.8",
+    "express": "^4.15.3",
+    "morgan": "^1.8.2",
+    "morgan-debug": "^2.0.0",
+    "pg": "^6.2.4",
+    "pg-promise": "^5.9.3",
+    "ramda": "^0.24.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.25.0",
+    "babel-eslint": "^7.2.3",
+    "babel-preset-latest": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "eslint": "^3.19.0",
+    "eslint-config-airbnb": "^14.1.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^3.0.2",
+    "eslint-plugin-react": "^6.9.0",
+    "mocha": "^3.4.2",
+    "nodemon": "^1.11.0",
+    "nyc": "^11.0.2",
+    "should": "^11.2.1",
+    "sinon": "^2.3.4"
+  },
+  "nyc": {
+    "exclude": []
+  },
+  "babel": {
+    "presets": [
+      [
+        "latest",
+        {
+          "modules": false
+        }
+      ],
+      "stage-0"
+    ]
+  }
+}
