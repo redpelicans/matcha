@@ -8,10 +8,11 @@
   "license": "MIT",
   "scripts": {
     "lint": "eslint src --color",
-    "srv:dev": "NODE_ENV=development DEBUG=matcha* nodemon --watch config --watch src/server --exec 'babel-node src/server'",
+    "srv:dev": "NODE_ENV=development DEBUG=matcha* nodemon --watch scripts--watch config --watch src/server --exec 'babel-node src/server'",
     "srv:prod": "NODE_ENV=production babel src --out-dir dist/",
     "srv:run": "NODE_ENV=production DEBUG=sfs*,evtx* node dist/server/cluster",
     "load:data": "NODE_ENV=development DEBUG=matcha* babel-node ./scripts/load_data",
+    "reset:data": "NODE_ENV=development DEBUG=matcha* babel-node ./scripts/reset_data",
     "test": "NODE_ENV=testing DEBUG=matcha* mocha --require babel-core/register --reporter spec \"./src/**/__test__/*.js\" ",
     "coverage": "NODE_ENV=testing nyc yarn test"
   },
@@ -24,7 +25,6 @@
     "express": "^4.15.3",
     "morgan": "^1.8.2",
     "morgan-debug": "^2.0.0",
-    "pg": "^6.2.4",
     "pg-promise": "^5.9.3",
     "ramda": "^0.24.1"
   },

@@ -1,5 +1,3 @@
-const queryDrop = 'DROP TABLE IF EXISTS users';
-
 const query = `CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   login VARCHAR NOT NULL,
@@ -9,6 +7,9 @@ const query = `CREATE TABLE IF NOT EXISTS users (
 );
 `;
 
-const loadSchema = ({ db }) => db.query(query).then(() => db);
+const loadSchema = (ctx) => {
+  const { db } = ctx;
+  return db.none(query).then(() => ctx);
+};
 
 export default loadSchema;
