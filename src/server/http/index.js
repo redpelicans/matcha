@@ -6,7 +6,7 @@ import bodyParser from 'body-parser';
 import logger from 'morgan-debug';
 import errors from './middlewares/errors';
 import login from './login';
-import forgetPassword from './forgetPassword';
+import resetPassword from './resetPassword';
 import api from './api';
 
 const getUrl = server => `http://${server.address().address}:${server.address().port}`;
@@ -22,9 +22,9 @@ const init = (ctx) => {
       .use(bodyParser.json())
       .use(bodyParser.urlencoded({ extended: true }))
       .use(logger('matcha:http', 'dev'))
-      .use('/ping', (req, res) => res.json('pong'))
+      .use('/ping', (req, res) => res.json({ ping: 'pong' }))
       .put('/login', login)
-      .put('/forget_password', forgetPassword)
+      .use('/reset_password', resetPassword)
       .use('/api', api)
       .use(errors());
 
@@ -36,10 +36,6 @@ const init = (ctx) => {
   });
   return promise;
 };
-
-// add jwt in cookie
-// middeleware atuh
-// route api/ users DONE
 
 // statuts connect or not
 // middleware password

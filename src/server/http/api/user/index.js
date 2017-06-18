@@ -6,8 +6,9 @@ import loadInfos from './loadInfos';
 const user = Router();
 
 user
+  .use((req, res, next) => { console.log('/user'); next(); })
   .get('/:id', userInfo)
-  .post(register)
+  .post('/', register)
   .get(loadInfos);
 
 export default user;

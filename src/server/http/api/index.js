@@ -9,6 +9,7 @@ const Api = Router();
 Api
   .use(getToken)
   .use(checkAuth)
+  .use((req, res, next) => { console.log('/api'); next(); })
   .use('/user', user)
   .use('/me', me);
 

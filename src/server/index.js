@@ -7,9 +7,7 @@ import initPostgres from './postgres';
 
 const logger = debug('matcha:server/index.js');
 
-// add start tim
-
-initPostgres({ config, startTime: new Date()})
+initPostgres({ config, startTime: new Date() })
   .then(loadSchema)
   .then(initHttp)
   .then(() => logger('Server started!'))

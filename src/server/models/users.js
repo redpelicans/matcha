@@ -1,30 +1,32 @@
+import pgpConnector from 'pg-promise';
 import { register } from '.';
-import { PreparedStatement as PS } from 'pg-promise';
+
+const pgp = pgpConnector({ capSQL: true });
 
 const users = {
   load(data) {
-    const { id, show } = data;
-    if (show.includes('password')) { return (Promise.reject(new Error('Password can\'t be printed'))); }
-    console.log(data);
-    return this.db.one('SELECT ${show~} FROM users WHERE id= $1', id, data); // eslint-disable-line
+    return this.db.oneOrNone("SELECT ${show~} FROM users WHERE ${type^} LIKE \'${value#}\' ", data); // eslint-disable-line
   },
   add(data) {
-    return this.db.one('INSERT INTO users (login, email, password) VALUES (${login}, ${email}, ${password}) RETURNING id', data);
+    const query = pgp.helpers.insert(data, null, 'users');
+    return this.db.result(`${query} RETURNING id`);
   },
+
   delete(id) {
-    return this.db.none(`DELETE FROM users WHERE id=${id}`, { id });
+    return this.db.result('DELETE FROM users WHERE id=$1', id);
   },
-  loadAll() {
-    // filter ALL
-    // this method is here for debugging, do not use it in prod. will be delete
-    return this.db.many('SELECT * FROM users ORDER BY ID ASC');
-  },
-  update(changes) {
-    // const { change, id, set } = data;
-    // if for exemple id so forbidden
-    // const { key, value
-    // filter
-    return this.db.none(`UPDATE users SET ${change} = '${set}' WHERE id = ${id}`);
+
+  // loadBy(data) {
+  //   const daa = { sexe: 'homme', region: 'paris' };
+  //   const query = pgp.helpers.sets(daa).replace(',', ' AND ');
+  //   // this method is here for debugging, do not use it in prod. will be delete
+  //   return this.db.any('SELECT * FROM users ORDER BY ID ASC');
+  // },
+
+  update(data, id) {
+    if (data.id) { return (Promise.reject({ msg: 'id can\'t be change' })); }
+    const query = `${pgp.helpers.update(data, null, 'users')} WHERE id=${id}`;
+    return this.db.result(query);
   },
 };
 

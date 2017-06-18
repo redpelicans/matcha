@@ -1,9 +1,10 @@
 const errors = () => (err, req, res, next) => {
   if (!err) next();
-  console.error(err); // eslint-disable-line no-console
+  console.error('errors middleware'); // eslint-disable-line no-console
+  // console.error(err); // eslint-disable-line no-console
   res
-    .status(500)
-    .json({ error: err.toString() });
+    .status(err.status)
+    .json({ error: err.msg });
 };
 
 export default errors;
