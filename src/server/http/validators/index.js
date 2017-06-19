@@ -15,7 +15,7 @@ export const register = (data) => {
 export const login = (data) => {
   const res = { msg: '' };
   if (parser.password(data.password)) res.msg = 'Wrong password format';
-  else if (parser.login(data.login)) res.msg = 'Wrong login format';
+  else if (parser.mail(data.email)) res.msg = 'Wrong email format';
   else return false;
   return res;
 };

@@ -5,6 +5,7 @@ module.exports = {
   secret: {
     path: path.join(__dirname, '../etc/secret.js'),
   },
+  expiresIn: '10h',
   server,
   postgres: {
     host: 'rp3.redpelicans.com',

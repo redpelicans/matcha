@@ -1,5 +1,5 @@
 const getToken = (req, res, next) => {
-  const token = req.cookies.token || req.headers.authorization || req.query.token || req.body.token;
+  const token = req.cookies.matchaToken || req.query.token;
   req.token = token;
   next();
 };

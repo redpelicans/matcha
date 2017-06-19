@@ -6,24 +6,26 @@ import bodyParser from 'body-parser';
 import logger from 'morgan-debug';
 import errors from './middlewares/errors';
 import login from './login';
-import api from './api';
+import connectEvtx from './connector';
+import initApi from './api';
 
 const getUrl = server => `http://${server.address().address}:${server.address().port}`;
 
 const init = (ctx) => {
   const app = express();
+  const { evtx } = ctx.services;
   const { server: { host, port } } = ctx.config;
   const promise = new Promise(resolve => {
     const httpServer = http.createServer(app);
     app
       .use(compression())
       .use(cookieParser())
-      .use(bodyParser.json())
-      .use(bodyParser.urlencoded({ extended: true }))
+      .use(bodyParser.json(), bodyParser.urlencoded({ extended: true }))
       .use(logger('matcha:http', 'dev'))
       .use('/ping', (req, res) => res.json({ ping: 'pong' }))
-      .put('/login', login)
-      .use('/api', api)
+      .put('/login', login(ctx.config))
+      .use('/api', initApi(ctx))
+      // .use('/api', connectEvtx(evtx))
       .use(errors());
 
     httpServer.listen(port, host, () => {

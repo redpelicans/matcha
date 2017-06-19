@@ -1,16 +1,14 @@
 import { Router } from 'express';
 import getToken from '../middlewares/getToken';
-import checkAuth from '../middlewares/checkAuth';
-import user from './user';
-import me from './me';
+import initUser from './user';
 
-const Api = Router();
-
-Api
+const initApi = ({ config }) => {
+  const api = Router();
+  api
   .use(getToken)
-  .use(checkAuth)
-  .use((req, res, next) => { console.log('/api'); next(); })
-  .use('/user', user)
-  .use('/me', me);
+  .use('/users', initUser(config));
+  return api;
+};
 
-export default Api;
+
+export default initApi;
