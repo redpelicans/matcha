@@ -11,11 +11,11 @@ const users = {
           delete res.password; return res;
         });
     }
-    return this.db.oneOrNone("SELECT ${show~} FROM users WHERE ${type^} LIKE \'${value#}\' ", data);
+    return this.db.oneOrNone("SELECT ${show~} FROM users WHERE ${type^} LIKE \'${value#}\'", data);
   },
+
   add(data) {
     const query = pgp.helpers.insert(data, null, 'users');
-    console.log(query);
     return this.db.result(`${query} RETURNING id`);
   },
 
