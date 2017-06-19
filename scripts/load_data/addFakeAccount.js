@@ -1,6 +1,8 @@
-const addFakeAccount = (ctx) => {
-  const { db } = ctx;
-  const data = { login: 'abarriel', email: 'allan.barrielle@gmail.com', password: 'password!1' };
-  return db.one('INSERT INTO users(login,email,password) VALUES(${login}, ${email}, ${password}) RETURNING *', data);
+import users from '../../src/server/models/users';
+
+const addFakeAccount = () => {
+  const user = { login: 'abarriel', email: 'allan.barrielle@gmail.com', password: 'passwd1', firstname: 'allan', lastname: 'barrielle' };
+  return users.add(user);
 };
+
 export default addFakeAccount;
