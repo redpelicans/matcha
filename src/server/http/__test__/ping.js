@@ -28,4 +28,18 @@ describe('http:ping', function () {
         done();
       });
   })
-} );
+  // it('should get register', function (done) {
+  //   const url = `${this.context.http.url}/api/user`;
+  //   axios({ method: 'post', url, data: {
+  //     login: 'aabarriel',
+  //     email: 'aallan.barrielle@gmail.com',
+  //     password: 'password!1',
+  //     firstname: 'allan',
+  //     lastname: 'barrielle',
+  //   }})
+  //     .then(({data}) => {
+  //       console.log(data);
+  //     })
+  //     .catch(console.log);
+  // })
+});

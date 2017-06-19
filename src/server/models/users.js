@@ -5,10 +5,17 @@ const pgp = pgpConnector({ capSQL: true });
 
 const users = {
   load(data) {
-    return this.db.oneOrNone("SELECT ${show~} FROM users WHERE ${type^} LIKE \'${value#}\' ", data); // eslint-disable-line
+    if (!data.show) {
+      return this.db.oneOrNone(`SELECT * FROM users WHERE id = ${data}`)
+        .then(res => {
+          delete res.password; return res;
+        });
+    }
+    return this.db.oneOrNone("SELECT ${show~} FROM users WHERE ${type^} LIKE \'${value#}\' ", data);
   },
   add(data) {
     const query = pgp.helpers.insert(data, null, 'users');
+    console.log(query);
     return this.db.result(`${query} RETURNING id`);
   },
 

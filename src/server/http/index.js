@@ -6,7 +6,6 @@ import bodyParser from 'body-parser';
 import logger from 'morgan-debug';
 import errors from './middlewares/errors';
 import login from './login';
-import resetPassword from './resetPassword';
 import api from './api';
 
 const getUrl = server => `http://${server.address().address}:${server.address().port}`;
@@ -24,7 +23,6 @@ const init = (ctx) => {
       .use(logger('matcha:http', 'dev'))
       .use('/ping', (req, res) => res.json({ ping: 'pong' }))
       .put('/login', login)
-      .use('/reset_password', resetPassword)
       .use('/api', api)
       .use(errors());
 
@@ -38,8 +36,5 @@ const init = (ctx) => {
 };
 
 // statuts connect or not
-// middleware password
-// /api/users/1
-// restufl
 
 export default init;

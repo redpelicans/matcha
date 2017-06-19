@@ -30,6 +30,13 @@ describe('models:users:method', function(){
       }).catch(done);
   })
 
+  it('should load all info user from users except pass', function(done){
+      const data = 1;
+      users.load(data).then((resp) => {
+        should(resp).type('object');
+        done();
+        }).catch(done);
+    })
   it('should not print any password from users - Error', function(done){
     const data = { id: 1, show: [ 'login','email','password' ] };
     users.load(data).catch((resp) => {
@@ -46,16 +53,9 @@ describe('models:users:method', function(){
       }).catch(done);
   });
 
-  // it('should load all user from users ', function(done){
-  //   users.loadBy({}).then((resp) => {
-  //     should(resp).type('object');
-  //     done();
-  //     }).catch(done);
-  // });
-
    it('should not update id at any time - error', function(done){
     const data = { id: 1, val: 123, msg: 'hello' };
-    users.update(data).catch((resp) => {
+    users.update(data, 1).catch((resp) => {
       should(resp).type('object');
       done();
     });
@@ -68,20 +68,8 @@ describe('models:users:method', function(){
     }).catch(done);
   });
 
-  // it('should not update id at any time - error', function(done){
-  //   const data = { id: 1, val: 123, msg: 'hello' };
-  //   users.update(data).then(done).catch((resp) => {
-  //     should(resp).type('object');
-  //     done();
-  //   });
-  // });
-
 //   // start stock in srv
 //   // /status => http, ping sur db and res = success, with all params without passwd
-//   // /ping pour http
 //   // dont use pool for test
-//   // test ouf
-//   // supprier addfake account handle error
 //   // keet reset_Data;
-//   // recup cookie / if not cookie  throw err
 });

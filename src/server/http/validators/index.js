@@ -19,3 +19,11 @@ export const login = (data) => {
   else return false;
   return res;
 };
+
+export const parse = (data) => {
+  if (data.email) return parser.mail(data.email);
+  if (data.password) return parser.password(data.email);
+  if (data.login) return parser.login(data.email);
+  if (data.firstname || data.lastname) return parser.name(data.email);
+  return false;
+};

@@ -18,7 +18,7 @@ const login = (req, res, next) => {
       if (!resp) return;
       const token = jwt.sign({ data: { user, id: resp.id } }, secretSentence, { expiresIn: '24h' });
       res.cookie('token', token, { httpOnly: true });
-      res.json({ status: 200 });
+      res.json({ status: 200, msg: 'now connected' });
     })
     .catch(() => next({ status: 201, msg: 'failed to authenticate' }));
 };
