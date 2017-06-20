@@ -2,10 +2,12 @@ import axios from 'axios';
 import should from 'should';
 import initHttp from '..';
 import config from '../../../../config';
+import initServices from '../../services';
 
 describe('http:ping', function () {
   before(function () {
-    return initHttp({ config })
+    return initServices({ config })
+      .then(initHttp)
       .then((context) => {
           this.context = context;
       })
@@ -19,6 +21,17 @@ describe('http:ping', function () {
       })
       .catch(done);
   })
+
+  it('should print status', function (done) {
+    const url = `${this.context.http.url}/api/status`;
+    axios({ method: 'get', url })
+    .then(({data}) => {
+      should(data).type('object');
+      done();
+    })
+    .catch(done);
+  })
+
   it('should not ping', function (done) {
     const url = `${this.context.http.url}/notroute`;
     axios({ method: 'get', url })

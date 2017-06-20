@@ -23,16 +23,15 @@ describe('models:users:method', function(){
   })
 
   it('should load a user from users', function(done){
-    const data = { type: 'login', value: 'abarriel', show: [ 'login','email' ] };
-    users.load(data).then((resp) => {
+    users.load(1).then((resp) => {
       should(resp).type('object');
       done();
       }).catch(done);
   })
 
   it('should load all info user from users except pass', function(done){
-      const data = 1;
-      users.load(data).then((resp) => {
+      const data = 'allan.barrielle@gmail.com';
+      users.getByEmail(data).then((resp) => {
         should(resp).type('object');
         done();
         }).catch(done);

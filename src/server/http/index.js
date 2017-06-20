@@ -4,10 +4,13 @@ import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import logger from 'morgan-debug';
+import generateOneTimeToken from './middlewares/generateOneTimeToken';
 import errors from './middlewares/errors';
+import checkToken from './middlewares/checkToken';
+import getToken from './middlewares/getToken';
+import resetPassword from './resetPassword';
 import login from './login';
 import connectEvtx from './connector';
-import initApi from './api';
 
 const getUrl = server => `http://${server.address().address}:${server.address().port}`;
 
@@ -24,8 +27,11 @@ const init = (ctx) => {
       .use(logger('matcha:http', 'dev'))
       .use('/ping', (req, res) => res.json({ ping: 'pong' }))
       .put('/login', login(ctx.config))
-      .use('/api', initApi(ctx))
-      // .use('/api', connectEvtx(evtx))
+      .get('/lost_password', generateOneTimeToken)
+      .post('/reset_password', checkToken, resetPassword)
+      // .use(checkAuth(config))
+      // .get('/verify', verifyUser)
+      .use('/api', getToken, connectEvtx(evtx))
       .use(errors());
 
     httpServer.listen(port, host, () => {

@@ -1,23 +1,21 @@
 const getVerb = (req) => req.method.toLowerCase();
-const getService = (req) => {
-  const re = new RegExp(/^\/+(\w+)/); // assing id or no assign
-  const [,service] = re.exec(req.url); //eslint-disable-line
-  return service;
-};
-const getInput = (req) => Object.assign(req.query, req.body);
+
+const getInput = (req, id) => Object.assign(req.query, req.body, id && { id });
+
 const getMessage = (req) => {
-  const [service, method, input] = [getService(req), getVerb(req), getInput(req)];
-  console.log(service, method, input);
+  const re = new RegExp(/^\/+(\w+)\/?(\d?)/);
+  const [, service, id] = re.exec(req.url); //eslint-disable-line
+  const [method, input] = [getVerb(req), getInput(req, id)];
+  console.log(`Service ${service}, Method ${method}, Input`);
+  console.log(input);
   return { service, method, input };
 };
 
 const connector = (evtx) => (req, res, next) => {
   evtx
-    .run(getMessage(req))
-    .then(data => {
-      res.json(data);
-    })
-    .catch(next);
+    .run(getMessage(req), { req })
+    .then(data => res.json(data))
+    .catch((err) => next(err));
 };
 
 export default connector;

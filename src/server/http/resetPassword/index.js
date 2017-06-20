@@ -1,5 +1,5 @@
-import users from '../../../../models/users';
-import { password as parser } from '../../../validators/parsers';
+import users from '../../models/users';
+import { password as parser } from '../validators/parsers';
 
 const resetPassword = (req, res, next) => {
   const { password } = req.body;

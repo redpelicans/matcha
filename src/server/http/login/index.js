@@ -5,10 +5,10 @@
  import users from '../../models/users';
 
  const getConnected = ({ secretSentence, expiresIn }) => (req, res, next) => {
-   const { email, password } = req.body;
+   const { login, password } = req.body;
    const parser = validator(req.body);
    if (parser) return next({ status: 202, ...parser });
-   users.getByEmail(email)
+   users.getByEmail(login)
     .then((user) => {
       if (!user || !user.confirmed) return next({ status: 203 });
       if (!bcrypt.compareSync(password, user.password)) return next({ status: 201 });

@@ -8,6 +8,10 @@ const modelProto = {
     this.db = db;
     return this;
   },
+  ping() {
+    if (!this.db) return Promise.reject(new Error('db is not initialiazed'));
+    return this.db.query('SELECT 1');
+  },
 };
 
 export const connect = ({ postgres: config }) => {

@@ -1,7 +1,7 @@
 const query = `CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
-  login VARCHAR UNIQUE NOT NULL,
-  email VARCHAR NOT NULL,
+  login VARCHAR  NOT NULL,
+  email VARCHAR UNIQUE NOT NULL,
   password VARCHAR NOT NULL,
   firstname VARCHAR NOT NULL,
   lastname VARCHAR NOT NULL,
