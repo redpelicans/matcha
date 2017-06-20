@@ -30,6 +30,7 @@ const service = {
 };
 
 const checkAuth = (ctx) => {
+  console.log(ctx);
   const { globals: { config: { secretSentence } } } = ctx;
   const { req: { token } } = ctx.locals;
   const decoded = jwt.verify(token, secretSentence);

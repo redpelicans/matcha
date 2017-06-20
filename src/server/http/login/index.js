@@ -1,7 +1,6 @@
- import bcrypt from 'bcrypt';
+ import bcrypt from 'bcrypt-as-promised';
  import jwt from 'jsonwebtoken';
  import R from 'ramda';
- import { login as validator } from '../validators';
  import users from '../../models/users';
 
  const getConnected = ({ secretSentence, expiresIn }) => (req, res, next) => {
@@ -11,11 +10,12 @@
    users.getByEmail(login)
     .then((user) => {
       if (!user || !user.confirmed) return next({ status: 203 });
-      if (!bcrypt.compareSync(password, user.password)) return next({ status: 201 });
-      const token = jwt.sign({ sub: user.id }, secretSentence, { expiresIn });
-      res.cookie('matchaToken', token, { httpOnly: true });
-      res.json(R.omit('password', user));
-      return user;
+      return bcrypt.compare(password, user.password).then(() => {
+        const token = jwt.sign({ sub: user.id }, secretSentence, { expiresIn });
+        res.cookie('matchaToken', token, { httpOnly: true });
+        res.json(R.omit('password', user));
+        return user;
+      });
     })
     .catch(() => next({ status: 201 }));
  };

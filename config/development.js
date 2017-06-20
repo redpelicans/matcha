@@ -5,6 +5,12 @@ module.exports = {
   secret: {
     path: path.join(__dirname, '../etc/secret.js'),
   },
+  httpCode: {
+    BadRequest: 200,  //  400
+    Unauthorized: 201, // 401
+    Forbidden: 203,    // 403
+    Error: 204,       //  404
+  },
   expiresIn: '10h',
   server,
   postgres: {
