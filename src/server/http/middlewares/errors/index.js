@@ -1,6 +1,5 @@
 const errors = () => (err, req, res, next) => {
   if (!err) next();
-  console.log(err);
   // if (!err.status) return res.status(201).json({ error: 'err.message' });
   if (err.name === 'error') return res.status(201).json({ error: 'Unauthorized' });
   res.status(err.status);

@@ -42,17 +42,13 @@ describe('http:ping', function () {
       lastname: 'barrielle',
     }})
     .then(({data}) => {
-      console.log(data);
-      // should(data).type('object');
-      // done();
+      // console.log(data);
+      should(data).type('object');
+      done();
     })
-      // .then(({data})) => {
-      //   console.log('usefeirsohfeorifheorhfeiorhferfer5468465468468468468468468r');
-      //   console.log(data);
-      //   should(newUser.id).be.a.Number;
-      //  should(R.omit(['id', 'confirmed'], newUser)).eql(user);
-      //  done();
-      // })
-      .catch((err) => console.log('err'));
+    .catch((err) => {
+      console.log('err');
+      done();
+    });
   })
 });
