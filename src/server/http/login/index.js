@@ -1,27 +1,22 @@
- import bcrypt from 'bcrypt-as-promised';
- import jwt from 'jsonwebtoken';
- import R from 'ramda';
- import users from '../../models/users';
+import bcrypt from 'bcrypt-as-promised';
+import jwt from 'jsonwebtoken';
+import R from 'ramda';
 
- const getConnected = ({ secretSentence, expiresIn }) => (req, res, next) => {
-   const { login, password } = req.body;
-   const parser = validator(req.body);
-   if (parser) return next({ status: 202, ...parser });
-   users.getByEmail(login)
-    .then((user) => {
-      if (!user || !user.confirmed) return next({ status: 203 });
-      return bcrypt.compare(password, user.password).then(() => {
-        const token = jwt.sign({ sub: user.id }, secretSentence, { expiresIn });
-        res.cookie('matchaToken', token, { httpOnly: true });
-        res.json(R.omit('password', user));
-        return user;
-      });
-    })
-    .catch(() => next({ status: 201 }));
- };
+const getConnected = ({ config: { secretSentence, expiresIn }, models: { users } }) => (req, res, next) => {
+  const { login, password } = req.body;
+//  const parser = validator(req.body);
+//  if (parser) return next({ status: 202, ...parser });
+  users.getByEmail(login)
+  .then((user) => {
+    if (!user || !user.confirmed) return next({ status: 203 });
+    return bcrypt.compare(password, user.password).then(() => {
+      const token = jwt.sign({ sub: user.id }, secretSentence, { expiresIn });
+      res.cookie('matchaToken', token, { httpOnly: true });
+      res.json(R.omit('password', user));
+      return user;
+    });
+  })
+  .catch(() => next({ status: 201 }));
+};
 
- export default getConnected;
-
-// 201 NOT FOUND
-// 202 WRONG type
-// 203 ALREADY
+export default getConnected;

@@ -1,8 +1,5 @@
 import { connect } from '../models';
 
-const init = (ctx) => connect(ctx.config)
-    .then(client => ({ ...ctx, db: client }));
+const init = (ctx) => connect(ctx.config).then(({ db, models }) => ({ ...ctx, db, models }));
 
 export default init;
-
-// ping dans init

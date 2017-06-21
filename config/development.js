@@ -6,10 +6,10 @@ module.exports = {
     path: path.join(__dirname, '../etc/secret.js'),
   },
   httpCode: {
-    BadRequest: 200,  //  400
     Unauthorized: 201, // 401
+    BadRequest: 202,  //  400
     Forbidden: 203,    // 403
-    Error: 204,       //  404
+    error: 306,       //  404
   },
   expiresIn: '10h',
   server,
@@ -18,5 +18,9 @@ module.exports = {
     port: 5432,
     database: 'matcha',
     user: 'postgres',
+  },
+  routes: {
+    confirmEmail: '/api/confirm_email',
+    resetPassword: '/api/reset_password',
   },
 };

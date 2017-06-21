@@ -4,7 +4,7 @@ import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import logger from 'morgan-debug';
-import generateOneTimeToken from './middlewares/generateOneTimeToken';
+import sendTokenResetPassword from './sendTokenResetPassword';
 import errors from './middlewares/errors';
 import checkToken from './middlewares/checkToken';
 import getToken from './middlewares/getToken';
@@ -26,11 +26,9 @@ const init = (ctx) => {
       .use(bodyParser.json(), bodyParser.urlencoded({ extended: true }))
       .use(logger('matcha:http', 'dev'))
       .use('/ping', (req, res) => res.json({ ping: 'pong' }))
-      .put('/login', login(ctx.config))
-      .get('/lost_password', generateOneTimeToken)
+      .put('/login', login(ctx))
+      .get('/lost_password', sendTokenResetPassword(ctx))
       .post('/reset_password', checkToken, resetPassword)
-      // .use(checkAuth(config))
-      // .get('/verify', verifyUser)
       .use('/api', getToken, connectEvtx(evtx))
       .use(errors());
 
@@ -42,7 +40,5 @@ const init = (ctx) => {
   });
   return promise;
 };
-
-// statuts connect or not
 
 export default init;

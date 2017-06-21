@@ -8,15 +8,19 @@ const users = {
     return this.db.one(`SELECT * FROM users WHERE id = ${id}`);
   },
   getByEmail(email) {
-      return this.db.one('SELECT * FROM users WHERE login = $1', email);
+    return this.db.one('SELECT * FROM users WHERE login = $1', email);
   },
   add(data) {
     const query = pgp.helpers.insert(data, null, 'users');
-    return this.db.one(`${query} RETURNING id`);
+    return this.db.one(`${query} RETURNING *`);
   },
   delete(id) {
     return this.db.one('DELETE FROM users WHERE id=$1 RETURNING *', id);
   },
+  deleteAll() {
+    return this.db.any('DELETE FROM users');
+  },
+
   // loadBy(data) {
   //   const daa = { sexe: 'homme', region: 'paris' };
   //   const query = pgp.helpers.sets(daa).replace(',', ' AND ');
@@ -31,4 +35,4 @@ const users = {
   },
 };
 
-export default register(users);
+export default register('users', users);

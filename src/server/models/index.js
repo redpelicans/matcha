@@ -1,7 +1,7 @@
 import pgp from 'pg-promise';
 
 const pgConnector = pgp();
-const models = [];
+const models = {};
 
 const modelProto = {
   connect(db) {
@@ -17,15 +17,14 @@ const modelProto = {
 export const connect = ({ postgres: config }) => {
   const db = pgConnector(config);
   return db.connect()
-  .then(client => {
-    models.forEach(model => model.connect(client));
-    return client;
-  });
+    .then(client => {
+      Object.values(models).forEach(model => model.connect(client));
+      return { db: client, models };
+    });
 };
 
-
-export const register = (model) => {
+export const register = (name, model) => {
   const dbModel = Object.create(modelProto, Object.getOwnPropertyDescriptors(model));
-  models.push(dbModel);
+  models[name] = dbModel;
   return dbModel;
 };

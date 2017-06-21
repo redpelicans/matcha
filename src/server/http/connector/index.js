@@ -4,10 +4,8 @@ const getInput = (req, id) => Object.assign(req.query, req.body, id && { id });
 
 const getMessage = (req) => {
   const re = new RegExp(/^\/+(\w+)\/?(\d?)/);
-  const [, service, id] = re.exec(req.url); //eslint-disable-line
+  const [, service, id] = re.exec(req.url);
   const [method, input] = [getVerb(req), getInput(req, id)];
-  console.log(`Service ${service}, Method ${method}, Input`);
-  console.log(input);
   return { service, method, input };
 };
 

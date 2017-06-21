@@ -1,13 +1,12 @@
 import R from 'ramda';
-import users from '../models/users';
 
 const service = {
   name: 'status',
   get() {
-    const { startTime, config: { postgres } } = this.globals;
+    const { startTime, config: { postgres }, models: { users } } = this.globals;
     return users.ping().then(() => ({
       startTime,
-      postgres: { ...R.omit('password', postgres), ping: 'ok' },
+      postgres: { ...R.omit('password', postgres), ping: 'pongs' },
     }));
   },
 };
