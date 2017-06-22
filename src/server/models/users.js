@@ -4,6 +4,7 @@ import { register } from '.';
 const pgp = pgpConnector({ capSQL: true });
 
 const users = {
+
   load(id) {
     return this.db.one(`SELECT * FROM users WHERE id = ${id}`);
   },

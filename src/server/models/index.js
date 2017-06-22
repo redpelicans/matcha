@@ -1,4 +1,5 @@
 import pgp from 'pg-promise';
+// import EventEmitter from 'events';
 
 const pgConnector = pgp();
 const models = {};
