@@ -1,8 +1,12 @@
 import initPostgres from '../../src/server/postgres';
 import config from '../../config';
-import putFakeData from './fakeData';
-import printTableUsers from './printTableUsers';
+import addFakeAccount from './addFakeAccount';
 
 initPostgres({ config })
-  .then(putFakeData)
-  .then(printTableUsers);
+  .then(addFakeAccount);
+  // .then((ctx) => {
+  //   const { db } = ctx;
+  //   // console.log(db.cle);
+  //   db.client.end();
+  // })
+  // // .then()

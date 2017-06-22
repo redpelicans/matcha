@@ -1,14 +1,5 @@
-import pgp from 'pg-promise';
+import { connect } from '../models';
 
-const pgConnector = pgp();
+const init = (ctx) => connect(ctx.config).then(({ db, models }) => ({ ...ctx, db, models }));
 
-const connect = ({ postgres: config }) => {
-  const db = pgConnector(config);
-  return db.connect()
-  .then(client => client);
-};
-
-const init = (ctx) => connect(ctx.config)
-    .then(client => ({ ...ctx, db: client }));
-    
 export default init;
