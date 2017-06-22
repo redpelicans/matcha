@@ -6,7 +6,7 @@ const service = {
     const { startTime, config: { postgres }, models: { users } } = this.globals;
     return users.ping().then(() => ({
       startTime,
-      postgres: { ...R.omit('password', postgres), ping: 'pongs' },
+      postgres: { ...R.omit('password', postgres), ping: 'pong' },
     }));
   },
 };

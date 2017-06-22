@@ -45,14 +45,12 @@ export const sendConfirmEmail = (ctx) => {
 export const checkAuth = (ctx) => {
   const {
     globals: { config: { secretSentence } },
-    locals: { req: { token } },
+    locals: { req: { matchaToken } },
   } = ctx;
-  // console.log('checkAuth ', ctx.method, ctx.service); // eslint-disable-line
-  const tokenDataDecoded = jwt.verify(token, secretSentence);
-  if (!tokenDataDecoded) {
-    const { config: { httpCode: { Unauthorized } } } = ctx.globals;
-    return Promise.reject({ ...ctx, status: Unauthorized });
-  }
+  const { config: { httpCode: { Unauthorized } } } = ctx.globals;
+  if (!matchaToken) return Promise.reject({ status: Unauthorized });
+  const tokenDataDecoded = jwt.verify(matchaToken, secretSentence);
+  if (!tokenDataDecoded) return Promise.reject({ status: Unauthorized });
   return Promise.resolve({ ...ctx, input: { id: tokenDataDecoded.sub } });
 };
 

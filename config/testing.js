@@ -20,7 +20,7 @@ module.exports = {
     user: 'postgres',
   },
   routes: {
-    confirmEmail: '/api/confirm_email',
-    resetPassword: '/api/reset_password',
+    confirmEmail: 'api/confirm_email',
+    resetPassword: 'api/reset_password',
   },
 };

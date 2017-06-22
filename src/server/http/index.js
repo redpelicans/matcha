@@ -16,7 +16,7 @@ const getUrl = server => `http://${server.address().address}:${server.address().
 
 const init = (ctx) => {
   const app = express();
-  const { evtx } = ctx.services;
+  const { services: { evtx } } = ctx;
   const { server: { host, port } } = ctx.config;
   const promise = new Promise(resolve => {
     const httpServer = http.createServer(app);

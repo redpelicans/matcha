@@ -1,39 +1,100 @@
+/* global before, it, describe */
+/* eslint func-names: 0 */
 import should from 'should';
-import EvtX from 'evtx';
 import jwt from 'jsonwebtoken';
 import R from 'ramda';
-import initPostgres from '../../postgres';
 import config from '../../../../config';
+import init from '..';
 
-// const users = {
-//   name: 'users',
-//    add(user) {
-//      return Promise.resolve({ ...user,id: 1, confirmed: false });
-//   },
-// };
-//
-// describe('service:users', function(){
-//   before(function(){
-//       const ctx = { config: config };
-//       const { secretSentence, expiresIn } = config;
-//       const token = jwt.sign({ sub: 1 }, secretSentence, { expiresIn });
-//       ctx.matchaToken = token;
-//       this.ctx = ctx;
-//       return ctx;
-//   })
-//   it('should add an user', function(done){
-//     const { matchaToken } = this.ctx;
-//     const user = { login: 'abarriel', email: 'allan.barrielle@gmail.com', password: 'password!1', firstname: 'allan', lastname: 'barrielle' };
-//     const evtx = EvtX(this.ctx).configure(users);
-//     const params = { service: 'users', method: 'add', input: user };
-//     evtx.run(params, { req: { token: matchaToken } }).then((newUser) => {
-//       console.log('newUser');
-//       // should(newUser.id).be.a.Number;
-//       // should(R.omit(['id', 'confirmed'], newUser)).eql(user);
-//       // done();
-//     }).catch((err) => {
-//       console.log('err');
-//       done();
-//     });
-//   })
-// });
+const users = {
+  name: 'users',
+
+  add(user) {
+    return Promise.resolve({ ...user, id: 1, confirmed: false });
+  },
+  load(id) {
+    return Promise.resolve({ id });
+  },
+  update(data, id) {
+    return Promise.resolve({ ...data, id, confirmed: true });
+  },
+  delete(id) {
+    return Promise.resolve({ id });
+  },
+    // deleteAll() {
+    //   return this.db.any('DELETE FROM users');
+    // },
+};
+
+describe('service:users', () => {
+  before(function () {
+    const globals = { models: { users }, config };
+    return init(globals).then(({ services: { evtx } }) => {
+      this.evtx = evtx;
+      this.userId = 0;
+      this.matchaToken = '';
+    });
+  });
+
+  it('should add an user', function (done) {
+    const user = {
+      login: 'abarriel',
+      email: 'allan.barrielle@gmail.com',
+      password: 'password!1',
+      firstname: 'allan',
+      lastname: 'barrielle' };
+    const params = { service: 'users', method: 'post', input: user };
+    this.evtx.run(params).then((newUser) => {
+      this.userId = newUser.id;
+      should(R.omit(['id', 'confirmed', 'password'], newUser)).eql(R.omit(['password'], user));
+      done();
+    }).catch(done);
+  });
+
+  it('should confirm email user', function (done) {
+    const { secretSentence, expiresIn } = config;
+    const matchaToken = jwt.sign({ sub: this.userId }, secretSentence, { expiresIn });
+    this.matchaToken = matchaToken;
+    const params = { service: 'confirm_email', method: 'get' };
+    this.evtx.run(params, { req: { matchaToken } }).then((newUser) => {
+      should(newUser.id).type('number');
+      should(newUser.confirmed).eql(true);
+      done();
+    }).catch(done);
+  });
+
+  // it('should log user in', function (done) {
+  //   const user = { login: 'abarriel', password: 'password!1' };
+  //   const params = { service: 'users', method: 'put', input: user };
+  //   this.evtx.run(params).then((newUser) => {
+  //     console.log(newUser);
+  //     done();
+  //   }).catch(done);
+  // });
+
+  it('should update user', function (done) {
+    const infoToUpdate = { email: 'barrielle@gmail.com' };
+    const params = { service: 'users', method: 'put', input: infoToUpdate };
+    this.evtx.run(params, { req: { matchaToken: this.matchaToken } }).then((newUser) => {
+      should(newUser.email).eql('barrielle@gmail.com');
+      should(newUser.id).eql(this.userId);
+      done();
+    }).catch(done);
+  });
+
+  it('should not update user', function (done) {
+    const infoToUpdate = { email: 'barrielle@gmail.com' };
+    const params = { service: 'users', method: 'put', input: infoToUpdate };
+    const wrongToken = this.matchaToken.toLowerCase();
+    this.evtx.run(params, { req: { matchaToken: wrongToken } }).then(done)
+    .catch(() => done());
+  });
+
+  it('should delete user', function (done) {
+    const params = { service: 'users', method: 'delete' };
+    this.evtx.run(params, { req: { matchaToken: this.matchaToken } }).then((newUser) => {
+      should(newUser.id).eql(this.userId);
+      done();
+    }).catch(done);
+  });
+});

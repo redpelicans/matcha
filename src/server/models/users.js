@@ -4,7 +4,14 @@ import { register } from '.';
 const pgp = pgpConnector({ capSQL: true });
 
 const users = {
-
+  // authenticate(login, password) {
+  //   const user = { login: 'test', password: 'passtest' };
+  //   this.emit('login', user);
+  // },
+  logout() { // id
+    const user = { login: 'test', password: 'passtest' };
+    this.emit('logout', user);
+  },
   load(id) {
     return this.db.one(`SELECT * FROM users WHERE id = ${id}`);
   },
