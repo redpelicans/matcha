@@ -1,18 +1,19 @@
 import pgp from 'pg-promise';
+import EventEmitter from 'events';
 
 const pgConnector = pgp();
 const models = {};
 
-const modelProto = {
+class Proto extends EventEmitter {
   connect(db) {
     this.db = db;
     return this;
-  },
+  }
   ping() {
     if (!this.db) return Promise.reject(new Error('db is not initialiazed'));
     return this.db.query('SELECT 1');
-  },
-};
+  }
+}
 
 export const connect = ({ postgres: config }) => {
   const db = pgConnector(config);
@@ -24,7 +25,7 @@ export const connect = ({ postgres: config }) => {
 };
 
 export const register = (name, model) => {
-  const dbModel = Object.create(modelProto, Object.getOwnPropertyDescriptors(model));
+  const dbModel = Object.create(Proto.prototype, Object.getOwnPropertyDescriptors(model));
   models[name] = dbModel;
   return dbModel;
 };

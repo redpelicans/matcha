@@ -5,6 +5,9 @@ import { validateRegisterForm, checkAuth, getInfoToUpdate, sendConfirmEmail } fr
 const service = {
   name: 'users',
 
+  login() {
+
+  },
   get({ id }) {
     const { models: { users } } = this.globals;
     return users.load(Number(id)).then((user) => R.omit('password', user));
@@ -21,7 +24,7 @@ const service = {
     .then(hashedPassword => users.add(R.assoc('password', hashedPassword, user)));
   },
 
-  put({ id, infoToUpdate }) {
+  put({ id: { id }, infoToUpdate }) {
     const { models: { users } } = this.globals;
     return users.update(infoToUpdate, Number(id));
   },
@@ -31,6 +34,7 @@ const init = (evtx) => evtx
   .use(service.name, service)
   .service(service.name)
   .before({
+    get: [checkAuth],
     post: [validateRegisterForm],
     put: [checkAuth, getInfoToUpdate],
     delete: [checkAuth],

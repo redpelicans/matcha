@@ -1,6 +1,6 @@
 const getToken = (req, res, next) => {
-  const token = req.cookies.matchaToken || req.query.token;
-  req.token = token;
+  const token = req.cookies.matchaToken || req.query.matchaToken;
+  req.matchaToken = token;
   next();
 };
 

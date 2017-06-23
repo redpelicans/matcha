@@ -3,6 +3,7 @@ import debug from 'debug';
 import initPing from './ping';
 import initStatus from './status';
 import initUsers from './users';
+// import initLogin from './users';
 import initConfirmEmail from './confirmEmail';
 
 const logger = debug('matcha:services');
@@ -11,6 +12,7 @@ const allServices = [
   initPing,
   initStatus,
   initUsers,
+  // initLogin,
   initConfirmEmail,
 ];
 

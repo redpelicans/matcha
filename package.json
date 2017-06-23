@@ -30,6 +30,7 @@
     "morgan": "^1.8.2",
     "morgan-debug": "^2.0.0",
     "nodemailer": "^4.0.1",
+    "should": "^11.2.1",
     "pg-promise": "^5.9.3",
     "ramda": "^0.24.1"
   },
@@ -47,7 +48,6 @@
     "mocha": "^3.4.2",
     "nodemon": "^1.11.0",
     "nyc": "^11.0.2",
-    "should": "^11.2.1",
     "sinon": "^2.3.4"
   },
   "nyc": {
