@@ -1,8 +1,7 @@
 import jwt from 'jsonwebtoken';
 import Joi from 'joi';
 import geoip from 'geoip-lite';
-import R from 'ramda';
-import NodeGeocoder from 'node-geocoder';
+// import R from 'ramda';
 import schemaRegister from './schema';
 import mailer from '../../http/mailer';
 
@@ -66,20 +65,18 @@ export const getInfoToUpdate = (ctx) => {
 
 export const getIp = (ctx) => {
   const {
-    input,
+    input: user,
     locals: { req },
   } = ctx;
   let ip = req.connection.remoteAddress;
   if (ip === '127.0.0.1') ip = '62.210.34.191';
-  const user = { ...input, ip };
-  return Promise.resolve({ ...ctx, input: user });
+  return Promise.resolve({ ...ctx, input: { user, ip } });
 };
 
 export const getLocalisation = (ctx) => {
-  const { input } = ctx;
-  const geo = geoip.lookup(input.ip);
+  const { input: { user, ip } } = ctx;
+  const geo = geoip.lookup(ip);
   const range = { latitude: geo.ll[0], longitude: geo.ll[1] };
-  const user = Object.assign(R.omit('ip', input), range);
-  return Promise.resolve({ ...ctx, input: user });
-  // console.log(geocoder.freegeoip());
+  const userWithRange = Object.assign(user, range);
+  return Promise.resolve({ ...ctx, input: userWithRange });
 };

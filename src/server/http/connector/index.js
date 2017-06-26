@@ -6,6 +6,8 @@ const getMessage = (req) => {
   const re = new RegExp(/^\/+(\w+)\/?(\d?)/);
   const [, service, id] = re.exec(req.url);
   const [method, input] = [getVerb(req), getInput(req, id)];
+  const { suggestion } = input;
+  if (suggestion === 'yes') return { service, method: 'suggestion', input };
   return { service, method, input };
 };
 

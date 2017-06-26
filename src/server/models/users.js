@@ -29,12 +29,11 @@ const users = {
     return this.db.any('DELETE FROM users');
   },
 
-  // loadBy(data) {
-  //   const daa = { sexe: 'homme', region: 'paris' };
-  //   const query = pgp.helpers.sets(daa).replace(',', ' AND ');
-  //   // this method is here for debugging, do not use it in prod. will be delete
-  //   return this.db.any('SELECT * FROM users ORDER BY ID ASC');
-  // },
+  loadBy(filter) {
+    const {sexe, age } = filter;
+    console.log(age);
+    return this.db.any(`SELECT * FROM users WHERE sexe IN ($1:csv) AND age BETWEEN ${age[0]} AND ${age[1]}`, [sexe]);
+  },
 
   update(data, id) {
     if (data.id) { return (Promise.reject({ msg: 'id can\'t be change' })); }

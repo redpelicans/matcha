@@ -13,6 +13,7 @@ const query = `CREATE TABLE IF NOT EXISTS users (
   img TEXT,
   latitude VARCHAR,
   longitude VARCHAR,
+  popularity NUMERIC,
   confirmed BOOLEAN DEFAULT FALSE
 );
 ALTER SEQUENCE users_id_seq RESTART WITH 1;

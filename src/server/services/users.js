@@ -1,12 +1,13 @@
 import R from 'ramda';
 import bcrypt from 'bcrypt-as-promised';
 import { validateRegisterForm, getIp, getLocalisation, checkAuth, getInfoToUpdate, sendConfirmEmail } from './hooks';
+import { loadProfil, filterBy } from './hooks/suggestion';
 
 const service = {
   name: 'users',
 
-  login() {
-
+  suggestion() {
+    console.log('suggestion');
   },
   get({ id }) {
     const { models: { users } } = this.globals;
@@ -34,6 +35,7 @@ const init = (evtx) => evtx
   .use(service.name, service)
   .service(service.name)
   .before({
+    suggestion: [checkAuth, loadProfil, filterBy],
     get: [checkAuth],
     post: [validateRegisterForm, getIp, getLocalisation],
     put: [checkAuth, getInfoToUpdate],

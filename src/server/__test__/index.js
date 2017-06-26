@@ -8,7 +8,7 @@ import R from 'ramda';
 import config from '../../../config';
 import run from '../run';
 
-describe('functional:test', () => {
+describe.only('functional:test', () => {
   before(function () {
     return run(config)
       .then((ctx) => {
@@ -96,21 +96,30 @@ describe('functional:test', () => {
     })
     .catch(done);
   });
-
-  it('should delete user', function (done) {
-    const url = `${this.ctx.http.url}/api/users`;
-    axios({ headers: { Cookie: this.matchaToken }, withCredentials: true, method: 'delete', url })
-      .then(({ data: user }) => {
-        should(user.login).eql('abarriel');
-        done();
-      })
-      .catch(done);
+  it('should suggestion user', function (done) {
+    const url = `${this.ctx.http.url}/api/users?suggestion=yes`;
+    axios({ headers: { Cookie: this.matchaToken }, withCredentials: true, method: 'get', url })
+    .then(({ data: user }) => {
+      // should(user.id).eql(1);
+      done();
+    })
+    .catch(done);
   });
 
-  it('should not load user', function (done) {
-    const url = `${this.ctx.http.url}/api/users`;
-    axios({ method: 'get', url })
-    .then(done)
-    .catch(() => { done(); });
-  });
+  // it('should delete user', function (done) {
+  //   const url = `${this.ctx.http.url}/api/users`;
+  //   axios({ headers: { Cookie: this.matchaToken }, withCredentials: true, method: 'delete', url })
+  //     .then(({ data: user }) => {
+  //       should(user.login).eql('abarriel');
+  //       done();
+  //     })
+  //     .catch(done);
+  // });
+  //
+  // it('should not load user', function (done) {
+  //   const url = `${this.ctx.http.url}/api/users`;
+  //   axios({ method: 'get', url })
+  //   .then(done)
+  //   .catch(() => { done(); });
+  // });
 });
