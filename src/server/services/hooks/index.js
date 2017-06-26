@@ -1,16 +1,19 @@
 import jwt from 'jsonwebtoken';
 import Joi from 'joi';
+import geoip from 'geoip-lite';
+import R from 'ramda';
+import NodeGeocoder from 'node-geocoder';
 import schemaRegister from './schema';
 import mailer from '../../http/mailer';
 
 export const validateRegisterForm = (ctx) => {
   const { input } = ctx;
   const user = input;
-  // console.log('validateRegisterForm'); // eslint-disable-line
   if (Joi.validate(user, schemaRegister).error) {
     const { config: { httpCode: { BadRequest } } } = ctx.globals;
-    return Promise.reject({ ...ctx, status: BadRequest });
+    return Promise.reject({ status: BadRequest });
   }
+  // console.log('validateRegisterForm'); // eslint-disable-line
   return Promise.resolve({ ...ctx, input: user });
 };
 
@@ -59,4 +62,24 @@ export const getInfoToUpdate = (ctx) => {
   // console.log(ctx.message);
   const { input: id, message: { input: infoToUpdate } } = ctx;
   return Promise.resolve({ ...ctx, input: { id, infoToUpdate } });
+};
+
+export const getIp = (ctx) => {
+  const {
+    input,
+    locals: { req },
+  } = ctx;
+  let ip = req.connection.remoteAddress;
+  if (ip === '127.0.0.1') ip = '62.210.34.191';
+  const user = { ...input, ip };
+  return Promise.resolve({ ...ctx, input: user });
+};
+
+export const getLocalisation = (ctx) => {
+  const { input } = ctx;
+  const geo = geoip.lookup(input.ip);
+  const range = { latitude: geo.ll[0], longitude: geo.ll[1] };
+  const user = Object.assign(R.omit('ip', input), range);
+  return Promise.resolve({ ...ctx, input: user });
+  // console.log(geocoder.freegeoip());
 };

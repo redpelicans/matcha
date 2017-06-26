@@ -12,7 +12,7 @@
     "srv:prod": "NODE_ENV=production babel src --out-dir dist/",
     "srv:run": "NODE_ENV=production DEBUG=sfs*,evtx* node dist/server/cluster",
     "load:data": "NODE_ENV=development DEBUG=matcha* babel-node ./scripts/load_data",
-    "reset:data": "NODE_ENV=development DEBUG=matcha* babel-node ./scripts/reset_data",
+    "reset:data": "NODE_ENV=testing DEBUG=matcha* babel-node ./scripts/reset_data",
     "test": "NODE_ENV=testing DEBUG=matcha* mocha --require babel-core/register --reporter spec \"./src/**/__test__/*.js\" ",
     "coverage": "NODE_ENV=testing nyc yarn test"
   },
@@ -29,10 +29,11 @@
     "jsonwebtoken": "^7.4.1",
     "morgan": "^1.8.2",
     "morgan-debug": "^2.0.0",
+    "node-geocoder": "^3.18.0",
     "nodemailer": "^4.0.1",
-    "should": "^11.2.1",
     "pg-promise": "^5.9.3",
-    "ramda": "^0.24.1"
+    "ramda": "^0.24.1",
+    "should": "^11.2.1"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",

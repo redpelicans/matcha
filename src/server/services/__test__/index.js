@@ -42,11 +42,14 @@ describe('service:users', () => {
       email: 'allan.barrielle@gmail.com',
       password: 'password!1',
       firstname: 'allan',
-      lastname: 'barrielle' };
+      lastname: 'barrielle',
+      sexe: 'men',
+      age: '21',
+    };
     const params = { service: 'users', method: 'post', input: user };
     this.evtx.run(params).then((newUser) => {
       this.userId = newUser.id;
-      should(R.omit(['id', 'confirmed', 'password'], newUser)).eql(R.omit(['password'], user));
+      should(R.pick(['login', 'email', 'firstname', 'lastname', 'sexe', 'age'], newUser)).eql(R.omit(['password'], user));
       done();
     }).catch(done);
   });

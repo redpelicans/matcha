@@ -40,11 +40,13 @@ describe('functional:test', () => {
       password: 'password!1',
       firstname: 'allan',
       lastname: 'barrielle',
+      sexe: 'men',
+      age: '21',
     };
     axios({ method: 'post', url, data: user })
     .then(({ data: newUser }) => {
       should(newUser.id).type('number');
-      should(R.omit(['id', 'confirmed', 'password'], newUser)).eql(R.omit(['password'], user));
+      should(R.pick(['login', 'email', 'firstname', 'lastname', 'sexe', 'age'], newUser)).eql(R.omit(['password'], user));
       this.userId = newUser.id;
       done();
     })

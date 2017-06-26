@@ -1,6 +1,6 @@
 import R from 'ramda';
 import bcrypt from 'bcrypt-as-promised';
-import { validateRegisterForm, checkAuth, getInfoToUpdate, sendConfirmEmail } from './hooks';
+import { validateRegisterForm, getIp, getLocalisation, checkAuth, getInfoToUpdate, sendConfirmEmail } from './hooks';
 
 const service = {
   name: 'users',
@@ -35,7 +35,7 @@ const init = (evtx) => evtx
   .service(service.name)
   .before({
     get: [checkAuth],
-    post: [validateRegisterForm],
+    post: [validateRegisterForm, getIp, getLocalisation],
     put: [checkAuth, getInfoToUpdate],
     delete: [checkAuth],
   })
