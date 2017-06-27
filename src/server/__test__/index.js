@@ -9,7 +9,7 @@ import config from '../../../config';
 import run from '../run';
 import addFakeAccounts from '../postgres/addFakeAccounts';
 
-describe('functional:test', () => {
+describe.only('functional:test', () => {
   before(function () {
     return run(config)
       .then((ctx) => {

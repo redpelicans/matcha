@@ -7,7 +7,7 @@ import initHttp from '../../http';
 import initSocketIo from '..';
 import config from '../../../../config';
 
-describe.only('SocketIo', () => {
+describe('SocketIo', () => {
   before(function () {
     const globals = { models: { users: {} }, config };
     return initEvtx(globals)
