@@ -16,8 +16,8 @@ const query = `CREATE TABLE IF NOT EXISTS users (
   popularity NUMERIC,
   confirmed BOOLEAN DEFAULT FALSE
 );
-ALTER SEQUENCE users_id_seq RESTART WITH 1;
 `;
+// ALTER SEQUENCE users_id_seq RESTART WITH 1;
 
 const loadSchema = (ctx) => {
   const { db } = ctx;
