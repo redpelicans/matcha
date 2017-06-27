@@ -34,7 +34,8 @@
     "nodemailer": "^4.0.1",
     "pg-promise": "^5.9.3",
     "ramda": "^0.24.1",
-    "should": "^11.2.1"
+    "should": "^11.2.1",
+    "socketio": "^1.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",

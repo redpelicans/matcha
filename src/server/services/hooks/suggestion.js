@@ -1,7 +1,4 @@
 import geolib from 'geolib';
-import pgpConnector from 'pg-promise';
-
-const pgp = pgpConnector({ capSQL: true });
 
 const whichSexe = (sexe, orientation) => {
   if (orientation === 'homosexual') return [sexe];
@@ -28,6 +25,7 @@ export const loadProfil = (ctx) => {
       city,
       country,
     } = user;
+    lookingFor.mySexe = sexe;
     lookingFor.sexe = whichSexe(sexe, orientation);
     lookingFor.age = whichAge(age, 10);
     lookingFor.interest = interest;
@@ -39,11 +37,34 @@ export const loadProfil = (ctx) => {
   });
 };
 
-export const filterBy = (ctx) => {
+export const filterBySexeAge = (ctx) => {
   const { globals: { models: { users } }, input: lookingFor } = ctx;
   const { sexe, age } = lookingFor;
-  return users.loadBy({ sexe, age }).then((data) => {
-    console.log(data);
-    return Promise.resolve({ ...ctx });
-  })
+  return users.loadBy({ sexe, age }).then((data) => Promise.resolve({ ...ctx, input: { users: data, lookingFor } }));
+};
+
+export const cleanUser = (ctx) => {
+  const { users, lookingFor } = ctx.input;
+  const userClean = users.filter(user => {
+    if (user.orientation === 'bisexual') return user;
+    if (user.orientation === 'homosexual' && user.sexe === lookingFor.mySexe) return user;
+    if (user.orientation === 'heterosexual') {
+      if (lookingFor.sexe.includes('men') && user.sexe === 'women') return user;
+      if (lookingFor.sexe.includes('women') && user.sexe === 'men') return user;
+    }
+  });
+  return Promise.resolve({ ...ctx, input: { users: userClean, lookingFor } });
+};
+
+export const sortGeoLoc = (ctx) => {
+  // const { users, lookingFor } = ctx.input;
+  // const userClean = users.filter(user => {
+  //   if (user.orientation === 'bisexual') return user;
+  //   if (user.orientation === 'homosexual' && user.sexe === lookingFor.mySexe) return user;
+  //   if (user.orientation === 'heterosexual') {
+  //     if (lookingFor.sexe.includes('men') && user.sexe === 'women') return user;
+  //     if (lookingFor.sexe.includes('women') && user.sexe === 'men') return user;
+  //   }
+  // });
+  // return userClean;
 };

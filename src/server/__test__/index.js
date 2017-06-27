@@ -7,14 +7,16 @@ import cookie from 'cookie'; //eslint-disable-line
 import R from 'ramda';
 import config from '../../../config';
 import run from '../run';
+import addFakeAccounts from '../postgres/addFakeAccounts';
 
-describe.only('functional:test', () => {
+describe('functional:test', () => {
   before(function () {
     return run(config)
       .then((ctx) => {
         const { users } = ctx.models;
         return users.deleteAll().then(() => ctx);
       })
+      .then(addFakeAccounts)
       .then((ctx) => {
         this.ctx = ctx;
         this.userId = 0;
@@ -91,7 +93,7 @@ describe.only('functional:test', () => {
     const url = `${this.ctx.http.url}/api/users`;
     axios({ headers: { Cookie: this.matchaToken }, withCredentials: true, method: 'get', url })
     .then(({ data: user }) => {
-      should(user.id).eql(1);
+      should(user.id).type('number');
       done();
     })
     .catch(done);

@@ -4,7 +4,7 @@
 // import should from 'should';
 // import loadSchema from '../loadSchema';
 //
-// describe.only('models:users:method', function(){
+// describe('models:users:method', function(){
 //   before(function(){
 //     return initPostgres({ config, startTime: new Date()})
 //     .then(loadSchema)
@@ -66,5 +66,5 @@
 //       done();
 //     }).catch(done);
 //   });
-//
+
 // });

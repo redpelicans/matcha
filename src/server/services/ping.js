@@ -1,6 +1,6 @@
 const service = {
-  name: 'ping',
-  get() {
+  name: 'admin',
+  ping() {
     return Promise.resolve({ ping: 'pong' });
   },
 };

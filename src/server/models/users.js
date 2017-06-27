@@ -4,10 +4,6 @@ import { register } from '.';
 const pgp = pgpConnector({ capSQL: true });
 
 const users = {
-  // authenticate(login, password) {
-  //   const user = { login: 'test', password: 'passtest' };
-  //   this.emit('login', user);
-  // },
   logout() { // id
     const user = { login: 'test', password: 'passtest' };
     this.emit('logout', user);
@@ -30,9 +26,20 @@ const users = {
   },
 
   loadBy(filter) {
-    const {sexe, age } = filter;
-    console.log(age);
-    return this.db.any(`SELECT * FROM users WHERE sexe IN ($1:csv) AND age BETWEEN ${age[0]} AND ${age[1]}`, [sexe]);
+    const { sexe, age } = filter;
+    return this.db.any(`SELECT
+      login,
+      firstname,
+      lastname,
+      sexe,
+      orientation,
+      bio,
+      age,
+      interest,
+      img,
+      latitude,
+      longitude,
+      confirmed FROM users WHERE sexe IN ($1:csv) AND age BETWEEN ${age[0]} AND ${age[1]}`, [sexe]);
   },
 
   update(data, id) {
