@@ -53,6 +53,7 @@ export const cleanUser = (ctx) => {
       if (lookingFor.sexe.includes('women') && user.sexe === 'men') return user;
     }
   });
+  // console.log(users);
   return Promise.resolve({ ...ctx, input: { users: userClean, lookingFor } });
 };
 

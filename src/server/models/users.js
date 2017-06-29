@@ -1,4 +1,5 @@
 import pgpConnector from 'pg-promise';
+import jwt from 'jsonwebtoken';
 import { register } from '.';
 
 const pgp = pgpConnector({ capSQL: true });
@@ -10,6 +11,11 @@ const users = {
   },
   load(id) {
     return this.db.one(`SELECT * FROM users WHERE id = ${id}`);
+  },
+  getFromToken(token) {
+    const userDecoded = jwt.decoded(token);
+    if (!userDecoded) return Promise.reject(new Error('invalid token'));
+    return this.load(userDecoded.sub);
   },
   getByEmail(email) {
     return this.db.one('SELECT * FROM users WHERE login = $1', email);

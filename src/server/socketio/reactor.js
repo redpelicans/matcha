@@ -1,4 +1,6 @@
+import cookieParser from 'socket.io-cookie';
 import debug from 'debug';
+import users from '../models/users';
 
 const logger = debug('matcha:socketio');
 
@@ -6,6 +8,7 @@ const formatServiceMethod = (ctx) => {
   const { service, method, message: { type, payload } } = ctx;
   if (service && method) return Promise.resolve(ctx);
   const [serv, meth] = type.split(':');
+  console.log(service, method);
   return Promise.resolve({
     ...ctx,
     input: payload,
@@ -27,9 +30,29 @@ const formatResponse = (ctx) => {
   return Promise.resolve(ctx);
 };
 
+
+const getToken = (socket, next) => {
+  // const token = socket.request.headers.cookie.matchaToken || 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE0OTg2NDM2OTIsImV4cCI6MTUzMDE3OTcyNCwiYXVkIjoiIiwic3ViIjoiMSJ9.R_5B1rdr39y5ay9PNGgFbWUyS6JrXdlAv58sBdq8X6Q';
+  const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE0OTg2NDM2OTIsImV4cCI6MTUzMDE3OTcyNCwiYXVkIjoiIiwic3ViIjoiMSJ9.R_5B1rdr39y5ay9PNGgFbWUyS6JrXdlAv58sBdq8X6Q';
+  if (!token) {
+    logger('No token providen');
+    return next(new Error('No token providen'));
+  }
+  return users.getFromToken(token)
+    .catch(err => next(err))
+    .then(user => {
+      // console.log(user);
+      // const sessionId = socket.handshake.query.sessionId;
+      // register.add(user, socket, token, sessionId);
+      socket.request.user = user; // eslint-disable-line
+      next();
+    });
+};
+
 class Reactor {
-  constructor(evtx, io) {
+  constructor(evtx, io, config) {
     this.io = io;
+    this.config = config;
     this.evtx = evtx;
     this.initEvtX();
     this.initIO();
@@ -42,9 +65,10 @@ class Reactor {
   }
 
   initIO() {
+    //  only secretsentence
     const { evtx, io } = this;
-    // .use
-    // cookie parse
+    io.use(cookieParser);
+    io.use(getToken());
     io.on('connection', (socket) => {
       socket.on('action', (message) => {
         logger(`receive ${message.type} action`);
@@ -63,6 +87,6 @@ class Reactor {
   }
 }
 
-const init = (evtx, io) => Promise.resolve(new Reactor(evtx, io));
+const init = (evtx, io, config) => Promise.resolve(new Reactor(evtx, io, config));
 
 export default init;

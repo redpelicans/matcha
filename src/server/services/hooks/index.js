@@ -69,7 +69,7 @@ export const getIp = (ctx) => {
     locals: { req },
   } = ctx;
   let ip = req.connection.remoteAddress;
-  if (ip === '127.0.0.1') ip = '62.210.34.191';
+  if (ip === '127.0.0.1' || ip === '::1') ip = '62.210.34.191';
   return Promise.resolve({ ...ctx, input: { user, ip } });
 };
 

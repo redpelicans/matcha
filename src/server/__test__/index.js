@@ -9,7 +9,7 @@ import config from '../../../config';
 import run from '../run';
 import addFakeAccounts from '../postgres/addFakeAccounts';
 
-describe.only('functional:test', () => {
+describe('functional:test', () => {
   before(function () {
     return run(config)
       .then((ctx) => {
@@ -102,6 +102,7 @@ describe.only('functional:test', () => {
     const url = `${this.ctx.http.url}/api/users?suggestion=yes`;
     axios({ headers: { Cookie: this.matchaToken }, withCredentials: true, method: 'get', url })
     .then(({ data: user }) => {
+      console.log(user);
       // should(user.id).eql(1);
       done();
     })
