@@ -72,10 +72,11 @@ export const getInfoToUpdate = (ctx) => {
 };
 
 export const getIp = (ctx) => {
-  const {
-    input: user,
-    locals: { socket: { handshake: { address } } },
-  } = ctx;
+  const { input: user } = ctx;
+  if (process.env.NODE_ENV === 'testing') {
+    return Promise.resolve({ ...ctx, input: { user, ip: '62.210.34.191' } });
+  }
+  const { locals: { socket: { handshake: { address } } } } = ctx;
   let ip = address;
   if (ip === '127.0.0.1' || ip === '::1' || !ip) ip = '62.210.34.191';
   return Promise.resolve({ ...ctx, input: { user, ip } });

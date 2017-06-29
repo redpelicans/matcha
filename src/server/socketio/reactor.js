@@ -73,8 +73,8 @@ class Reactor {
 
   getConnectedUsers() {
     logger(this.sockets);
-  // return
   }
+
   initEvtX() {
     this.evtx
       .before(formatServiceMethod, getToken, getUserFromToken)
@@ -90,7 +90,7 @@ class Reactor {
         evtx.run(message, localCtx)
           .then((res) => {
             socket.emit('action', res);
-            this.getConnectedUsers();
+            // this.getConnectedUsers();
             logger(`sent ${res.type} action`);
           })
           .catch((err) => {
