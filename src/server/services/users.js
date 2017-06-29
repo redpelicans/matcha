@@ -1,13 +1,23 @@
 import R from 'ramda';
 import bcrypt from 'bcrypt-as-promised';
-import { validateRegisterForm, checkAuth, getInfoToUpdate, sendConfirmEmail } from './hooks';
+import jwt from 'jsonwebtoken';
+import { validateRegisterForm, getIp, getLocalisation, checkAuth, getInfoToUpdate, sendConfirmEmail, getToken, getByEmail } from './hooks';
+import { loadProfil, filterBySexeAge, cleanUser, sortGeoLoc } from './hooks/suggestion';
 
 const service = {
   name: 'users',
 
-  login() {
-
+  login({ user, password }) {
+    const { models: { users } } = this.globals;
+    return bcrypt.compare(password, user.password).then(() => {
+      const { globals: { config: { secretSentence }, expiresIn } } = this;
+      const token = jwt.sign({ sub: user.id }, secretSentence, { expiresIn });
+      const { socket } = this.locals;
+      users.emit('login', { user, socket });
+      return token;
+    });
   },
+
   get({ id }) {
     const { models: { users } } = this.globals;
     return users.load(Number(id)).then((user) => R.omit('password', user));
@@ -15,6 +25,7 @@ const service = {
 
   delete({ id }) {
     const { models: { users } } = this.globals;
+
     return users.delete(Number(id));
   },
 
@@ -34,10 +45,12 @@ const init = (evtx) => evtx
   .use(service.name, service)
   .service(service.name)
   .before({
+    login: [getByEmail],
+    suggestion: [checkAuth, loadProfil, filterBySexeAge, cleanUser, sortGeoLoc],
     get: [checkAuth],
-    post: [validateRegisterForm],
+    post: [validateRegisterForm, getIp, getLocalisation],
     put: [checkAuth, getInfoToUpdate],
-    delete: [checkAuth],
+    delete: [getToken, checkAuth],
   })
   .after({
     post: [sendConfirmEmail],

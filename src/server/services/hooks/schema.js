@@ -6,6 +6,9 @@ const schemaRegister = Joi.object().keys({
   password: Joi.string().regex(/^(?=.*[a-zA-Z])(?=.*\W)(?=.*[0-9]).{6,25}$/).required(),
   firstname: Joi.string().regex(/^[A-Za-z ]{2,30}$/).required(),
   lastname: Joi.string().regex(/^[A-Za-z ]{2,30}$/).required(),
+  age: Joi.number().integer().min(18).max(99)
+  .required(),
+  sexe: Joi.string().regex(/^[A-Za-z ]{2,30}$/).required(),
 });
 
 // export const schemaLogin = Joi.object().keys({

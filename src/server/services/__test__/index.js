@@ -42,11 +42,14 @@ describe('service:users', () => {
       email: 'allan.barrielle@gmail.com',
       password: 'password!1',
       firstname: 'allan',
-      lastname: 'barrielle' };
+      lastname: 'barrielle',
+      sexe: 'men',
+      age: '21',
+    };
     const params = { service: 'users', method: 'post', input: user };
     this.evtx.run(params).then((newUser) => {
       this.userId = newUser.id;
-      should(R.omit(['id', 'confirmed', 'password'], newUser)).eql(R.omit(['password'], user));
+      should(R.pick(['login', 'email', 'firstname', 'lastname', 'sexe', 'age'], newUser)).eql(R.omit(['password'], user));
       done();
     }).catch(done);
   });
@@ -62,15 +65,6 @@ describe('service:users', () => {
       done();
     }).catch(done);
   });
-
-  // it('should log user in', function (done) {
-  //   const user = { login: 'abarriel', password: 'password!1' };
-  //   const params = { service: 'users', method: 'put', input: user };
-  //   this.evtx.run(params).then((newUser) => {
-  //     console.log(newUser);
-  //     done();
-  //   }).catch(done);
-  // });
 
   it('should update user', function (done) {
     const infoToUpdate = { email: 'barrielle@gmail.com' };
