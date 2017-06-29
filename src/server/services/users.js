@@ -8,11 +8,12 @@ const service = {
   name: 'users',
 
   login({ user, password }) {
-    // const { models: { users } } = this.globals;
+    const { models: { users } } = this.globals;
     return bcrypt.compare(password, user.password).then(() => {
       const { globals: { config: { secretSentence }, expiresIn } } = this;
       const token = jwt.sign({ sub: user.id }, secretSentence, { expiresIn });
-      // users.emit('login', user);
+      const { socket } = this.locals;
+      users.emit('login', { user, socket });
       return token;
     });
   },

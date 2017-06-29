@@ -1,5 +1,6 @@
 import debug from 'debug';
 import jwt from 'jsonwebtoken';
+import R from 'ramda';
 
 const logger = debug('matcha:socketio');
 
@@ -58,7 +59,8 @@ class Reactor {
 
   initModels() {
     const registerUser = ({ user, socket }) => {
-      logger(`user ${user.firstname} logged out`);
+      // console.log(socket);
+      logger(`user ${user.firstname} logged in socket.id = ${socket.id}`);
       this.sockets[socket.id] = user;
     };
     const logoutUser = ({ user, socket }) => {
@@ -69,6 +71,10 @@ class Reactor {
     this.users.on('logout', logoutUser);
   }
 
+  getConnectedUsers() {
+    logger(this.sockets);
+  // return
+  }
   initEvtX() {
     this.evtx
       .before(formatServiceMethod, getToken, getUserFromToken)
@@ -84,6 +90,7 @@ class Reactor {
         evtx.run(message, localCtx)
           .then((res) => {
             socket.emit('action', res);
+            this.getConnectedUsers();
             logger(`sent ${res.type} action`);
           })
           .catch((err) => {

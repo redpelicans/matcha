@@ -114,6 +114,24 @@ describe.only('functional', () => {
     });
   });
 
+  it('should login an user', function (done) {
+    const data = {
+      login: 'abarriel',
+      password: 'password!1',
+    };
+    const message = {
+      type: 'users:login',
+      payload: data,
+      replyTo: 'put',
+    };
+    const io = socketIOClient.connect(this.url);
+    io.emit('action', message);
+    io.on('action', ({ payload }) => {
+      should(payload).type('string');
+      done();
+    });
+  });
+
   it('should update user', function (done) {
     const infoToUpdate = {
       email: 'barrielle@gmail.com',
