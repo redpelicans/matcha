@@ -66,15 +66,6 @@ describe('service:users', () => {
     }).catch(done);
   });
 
-  // it('should log user in', function (done) {
-  //   const user = { login: 'abarriel', password: 'password!1' };
-  //   const params = { service: 'users', method: 'put', input: user };
-  //   this.evtx.run(params).then((newUser) => {
-  //     console.log(newUser);
-  //     done();
-  //   }).catch(done);
-  // });
-
   it('should update user', function (done) {
     const infoToUpdate = { email: 'barrielle@gmail.com' };
     const params = { service: 'users', method: 'put', input: infoToUpdate };

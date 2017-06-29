@@ -7,7 +7,7 @@ import axios from 'axios';
 import socketIOClient from 'socket.io-client';
 import run from '../run';
 import config from '../../../config';
-import addFakeAccounts from '../postgres/addFakeAccounts';
+import addFakeAccounts from '../postgres/__test__/addFakeAccounts';
 
 describe.only('functional', () => {
   before(function () {
@@ -109,6 +109,7 @@ describe.only('functional', () => {
     const io = socketIOClient.connect(this.url);
     io.emit('action', message);
     io.on('action', ({ payload }) => {
+      should(payload).type('string');
       done();
     });
   });
@@ -126,25 +127,8 @@ describe.only('functional', () => {
     const io = socketIOClient.connect(this.url);
     io.emit('action', message);
     io.on('action', ({ payload }) => {
-      // const { payload } = res;
       should(payload.email).eql('barrielle@gmail.com');
       done();
     });
   });
-  //
-  // it('should load user', function (done) {
-  //   const message = {
-  //     type: 'users:get',
-  //     payload: {},
-  //     matchaToken: this.matchaToken,
-  //     replyTo: 'get',
-  //   };
-  //   const io = socketIOClient.connect(this.url);
-  //   io.emit('action', message);
-  //   io.on('action', (res) => {
-  //     const { payload } = res;
-  //     should(payload.id).eql(this.userId);
-  //     done();
-  //   });
-  // });
 });

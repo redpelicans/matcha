@@ -2,14 +2,12 @@ import EvtX from 'evtx';
 import debug from 'debug';
 import initStatus from './status';
 import initUsers from './users';
-import initConfirmEmail from './confirmEmail';
 
 const logger = debug('matcha:services');
 
 const allServices = [
   initStatus,
   initUsers,
-  initConfirmEmail,
 ];
 
 const initServices = (api) => allServices.reduce((acc, service) => acc.configure(service), api);

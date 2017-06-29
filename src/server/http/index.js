@@ -4,12 +4,8 @@ import compression from 'compression';
 import bodyParser from 'body-parser';
 import logger from 'morgan-debug';
 import sendTokenResetPassword from './sendTokenResetPassword';
-import errors from './middlewares/errors';
-import checkToken from './middlewares/checkToken';
-import getToken from './middlewares/getToken';
+import { errors, checkToken, getToken, getUser } from './middlewares';
 import resetPassword from './resetPassword';
-import login from './login';
-import getUser from './middlewares/getUserFromToken';
 import confirmEmail from './confirmEmail';
 
 const getUrl = server => `http://${server.address().address}:${server.address().port}`;
@@ -24,7 +20,6 @@ const init = (ctx) => {
       .use(bodyParser.json(), bodyParser.urlencoded({ extended: true }))
       .use(logger('matcha:http', 'dev'))
       .use('/ping', (req, res) => res.json({ ping: 'pong' }))
-      .put('/login', login(ctx))
       .get('/confirm_email', getToken(), getUser(ctx.config), confirmEmail())
       .get('/lost_password', sendTokenResetPassword(ctx))
       .post('/reset_password', checkToken, resetPassword)

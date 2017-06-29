@@ -1,42 +1,41 @@
 import R from 'ramda';
 import bcrypt from 'bcrypt-as-promised';
 import jwt from 'jsonwebtoken';
-import { validateRegisterForm, getIp, getLocalisation, checkAuth, getInfoToUpdate, sendConfirmEmail, getToken } from './hooks';
+import { validateRegisterForm, getIp, getLocalisation, checkAuth, getInfoToUpdate, sendConfirmEmail, getToken, getByEmail } from './hooks';
 import { loadProfil, filterBySexeAge, cleanUser, sortGeoLoc } from './hooks/suggestion';
-import users from '../models/users';
 
 const service = {
   name: 'users',
 
-  login({ login, password }) {
-    return users.getByEmail(login)
-    .then((user) => {
-      if (!user.confirmed) return Promise.reject({ status: 'Unauthorized' });
-      return bcrypt.compare(password, user.password).then(() => {
-        const { globals: { config: { secretSentence }, expiresIn } } = this;
-        const token = jwt.sign({ sub: user.id }, secretSentence, { expiresIn });
-        // users.emit('login', user);
-        return token;
-      });
+  login({ user, password }) {
+    // const { models: { users } } = this.globals;
+    return bcrypt.compare(password, user.password).then(() => {
+      const { globals: { config: { secretSentence }, expiresIn } } = this;
+      const token = jwt.sign({ sub: user.id }, secretSentence, { expiresIn });
+      // users.emit('login', user);
+      return token;
     });
   },
 
   get({ id }) {
+    const { models: { users } } = this.globals;
     return users.load(Number(id)).then((user) => R.omit('password', user));
   },
 
   delete({ id }) {
+    const { models: { users } } = this.globals;
+
     return users.delete(Number(id));
   },
 
   post(user) {
-    console.log('post model user');
+    const { models: { users } } = this.globals;
     return bcrypt.hash(user.password, 10)
     .then(hashedPassword => users.add(R.assoc('password', hashedPassword, user)));
   },
 
   put({ id: { id }, infoToUpdate }) {
-    console.log('put model user');
+    const { models: { users } } = this.globals;
     return users.update(infoToUpdate, Number(id));
   },
 };
@@ -45,7 +44,7 @@ const init = (evtx) => evtx
   .use(service.name, service)
   .service(service.name)
   .before({
-    // login: [validateLoginForm, getByEmail, login]
+    login: [getByEmail],
     suggestion: [checkAuth, loadProfil, filterBySexeAge, cleanUser, sortGeoLoc],
     get: [checkAuth],
     post: [validateRegisterForm, getIp, getLocalisation],

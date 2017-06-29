@@ -21,7 +21,6 @@
     "bcrypt-as-promised": "^1.1.0",
     "body-parser": "^1.17.2",
     "compression": "^1.6.2",
-    "cookie-parser": "^1.4.3",
     "debug": "^2.6.8",
     "evtx": "^0.3.2",
     "express": "^4.15.3",

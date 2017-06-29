@@ -1,3 +1,4 @@
+/* eslint-disable */
 const query = `
 INSERT INTO users(login, email, password, firstname, lastname, sexe, age, orientation, latitude, longitude) VALUES
 ('juliako','all.barrielle@gmail.com','$2a$10$vpiJTzmJVRLJe5qOM4T5eOtjd2jmUgV7JGM7Q5STQuXqgB6QbqAi6','julia','barrielle','women','21','heterosexual',48.8537,2.549),

@@ -57,12 +57,16 @@ class Reactor {
 
 
   initModels() {
-    const registerUser = (user) => {
+    const registerUser = ({ user, socket }) => {
+      logger(`user ${user.firstname} logged out`);
       this.sockets[socket.id] = user;
     };
+    const logoutUser = ({ user, socket }) => {
+      logger(`user ${user.firstname} logged out`);
+      delete this.sockets[socket.id];
+    };
     this.users.on('login', registerUser);
-    // this.users.on('like', (from, to) => {
-    // });
+    this.users.on('logout', logoutUser);
   }
 
   initEvtX() {
@@ -75,7 +79,7 @@ class Reactor {
     const { evtx, io } = this;
     io.on('connection', (socket) => {
       socket.on('action', (message) => {
-        // logger(`receive ${message.type} action`);
+        logger(`receive ${message.type} action`);
         const localCtx = { io, socket };
         evtx.run(message, localCtx)
           .then((res) => {

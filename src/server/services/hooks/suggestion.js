@@ -1,4 +1,4 @@
-import geolib from 'geolib';
+// import geolib from 'geolib';
 
 const whichSexe = (sexe, orientation) => {
   if (orientation === 'homosexual') return [sexe];
@@ -45,7 +45,7 @@ export const filterBySexeAge = (ctx) => {
 
 export const cleanUser = (ctx) => {
   const { users, lookingFor } = ctx.input;
-  const userClean = users.filter(user => {
+  const userClean = users.filter(user => { // eslint-disable-line
     if (user.orientation === 'bisexual') return user;
     if (user.orientation === 'homosexual' && user.sexe === lookingFor.mySexe) return user;
     if (user.orientation === 'heterosexual') {
@@ -53,11 +53,10 @@ export const cleanUser = (ctx) => {
       if (lookingFor.sexe.includes('women') && user.sexe === 'men') return user;
     }
   });
-  // console.log(users);
   return Promise.resolve({ ...ctx, input: { users: userClean, lookingFor } });
 };
 
-export const sortGeoLoc = (ctx) => {
+// export const sortGeoLoc = (ctx) => {
   // const { users, lookingFor } = ctx.input;
   // const userClean = users.filter(user => {
   //   if (user.orientation === 'bisexual') return user;
@@ -68,4 +67,4 @@ export const sortGeoLoc = (ctx) => {
   //   }
   // });
   // return userClean;
-};
+// };

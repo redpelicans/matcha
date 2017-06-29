@@ -1,12 +1,9 @@
 import jwt from 'jsonwebtoken';
 import Joi from 'joi';
 import geoip from 'geoip-lite';
-// import R from 'ramda';
-import debug from 'debug';
 import schemaRegister from './schema';
 import mailer from '../../http/mailer';
 
-const logger = debug('matcha:hooks');
 export const validateRegisterForm = (ctx) => {
   const { input } = ctx;
   const user = input;
@@ -18,6 +15,14 @@ export const validateRegisterForm = (ctx) => {
   return Promise.resolve({ ...ctx, input: user });
 };
 
+export const getByEmail = (ctx) => {
+  const { globals: { models: { users } }, input: { login, password } } = ctx;
+  return users.getByEmail(login)
+  .then((user) => {
+    if (!user.confirmed) return Promise.reject({ status: 'Unauthorized' });
+    return Promise.resolve({ ...ctx, input: { user, password } });
+  });
+};
 export const checkIfConfirmed = (ctx) => {
   const { globals: { models: { users } }, input: { id } } = ctx;
   // console.log('checkIfConfirmed'); // eslint-disable-line
@@ -53,7 +58,6 @@ export const checkAuth = (ctx) => {
     locals: { req },
   } = ctx;
   const { config: { httpCode: { Unauthorized } } } = ctx.globals;
-  logger('checkAuth'); // eslint-disable-line
   if (!req) matchaToken = ctx.matchaToken;
   else matchaToken = req.matchaToken;
   if (!matchaToken) return Promise.reject({ status: Unauthorized });
@@ -63,23 +67,17 @@ export const checkAuth = (ctx) => {
 };
 
 export const getInfoToUpdate = (ctx) => {
-  console.log('getInfoToUpdate'); // eslint-disable-line
-  // console.log(ctx.message);
   const { input: id, message: { payload: infoToUpdate } } = ctx;
   return Promise.resolve({ ...ctx, input: { id, infoToUpdate } });
 };
 
-// export const getToken = (ctx) => {
-//   const { locals: { message: { matchaToken } } } = ctx;
-//   return Promise.resolve({ ...ctx, locals: { matchaToken } });
-// };
 export const getIp = (ctx) => {
   const {
     input: user,
     locals: { socket: { handshake: { address } } },
   } = ctx;
   let ip = address;
-  if (ip === '127.0.0.1' || ip === '::1') ip = '62.210.34.191';
+  if (ip === '127.0.0.1' || ip === '::1' || !ip) ip = '62.210.34.191';
   return Promise.resolve({ ...ctx, input: { user, ip } });
 };
 

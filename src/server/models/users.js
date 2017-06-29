@@ -4,8 +4,7 @@ import { register } from '.';
 const pgp = pgpConnector({ capSQL: true });
 
 const users = {
-  logout() { // id
-    const user = { login: 'test', password: 'passtest' };
+  logout(user) {
     this.emit('logout', user);
   },
   load(id) {
