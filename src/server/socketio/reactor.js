@@ -1,6 +1,5 @@
-import cookieParser from 'socket.io-cookie';
 import debug from 'debug';
-import users from '../models/users';
+import jwt from 'jsonwebtoken';
 
 const logger = debug('matcha:socketio');
 
@@ -8,7 +7,7 @@ const formatServiceMethod = (ctx) => {
   const { service, method, message: { type, payload } } = ctx;
   if (service && method) return Promise.resolve(ctx);
   const [serv, meth] = type.split(':');
-  console.log(service, method);
+  // console.log(payload, serv, meth);
   return Promise.resolve({
     ...ctx,
     input: payload,
@@ -30,48 +29,53 @@ const formatResponse = (ctx) => {
   return Promise.resolve(ctx);
 };
 
+const getToken = (ctx) => {
+  const { message: { matchaToken } } = ctx;
+  return Promise.resolve({ ...ctx, matchaToken });
+};
 
-const getToken = (socket, next) => {
-  // const token = socket.request.headers.cookie.matchaToken || 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE0OTg2NDM2OTIsImV4cCI6MTUzMDE3OTcyNCwiYXVkIjoiIiwic3ViIjoiMSJ9.R_5B1rdr39y5ay9PNGgFbWUyS6JrXdlAv58sBdq8X6Q';
-  const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE0OTg2NDM2OTIsImV4cCI6MTUzMDE3OTcyNCwiYXVkIjoiIiwic3ViIjoiMSJ9.R_5B1rdr39y5ay9PNGgFbWUyS6JrXdlAv58sBdq8X6Q';
-  if (!token) {
-    logger('No token providen');
-    return next(new Error('No token providen'));
-  }
-  return users.getFromToken(token)
-    .catch(err => next(err))
-    .then(user => {
-      // console.log(user);
-      // const sessionId = socket.handshake.query.sessionId;
-      // register.add(user, socket, token, sessionId);
-      socket.request.user = user; // eslint-disable-line
-      next();
-    });
+const getUserFromToken = (ctx) => {
+  const { globals: { config: { secretSentence }, models: { users } }, matchaToken } = ctx;
+  // const { config: { httpCode: { Unauthorized } } } = ctx.globals;
+  if (!matchaToken) return Promise.resolve(ctx);
+  const dataDecoded = jwt.verify(matchaToken, secretSentence);
+  if (!dataDecoded) return Promise.resolve(ctx);
+  return users.load(dataDecoded.sub).then(user => ({ ...ctx, user }));
 };
 
 class Reactor {
-  constructor(evtx, io, config) {
+  constructor(evtx, io, secretKey, users) {
     this.io = io;
-    this.config = config;
+    this.secretKey = secretKey;
     this.evtx = evtx;
+    this.users = users;
+    this.sockets = {};
+    this.initModels();
     this.initEvtX();
-    this.initIO();
+    this.initIo();
+  }
+
+
+  initModels() {
+    const registerUser = (user) => {
+      this.sockets[socket.id] = user;
+    };
+    this.users.on('login', registerUser);
+    // this.users.on('like', (from, to) => {
+    // });
   }
 
   initEvtX() {
     this.evtx
-      .before(formatServiceMethod)
+      .before(formatServiceMethod, getToken, getUserFromToken)
       .after(formatResponse);
   }
 
-  initIO() {
-    //  only secretsentence
+  initIo() {
     const { evtx, io } = this;
-    io.use(cookieParser);
-    io.use(getToken());
     io.on('connection', (socket) => {
       socket.on('action', (message) => {
-        logger(`receive ${message.type} action`);
+        // logger(`receive ${message.type} action`);
         const localCtx = { io, socket };
         evtx.run(message, localCtx)
           .then((res) => {
@@ -79,7 +83,10 @@ class Reactor {
             logger(`sent ${res.type} action`);
           })
           .catch((err) => {
-            const res = { status: err.status };
+            let res = {};
+            if (!err.status) {
+              res = { details: err.detail, routine: err.routine };
+            } else res = { status: err.status };
             socket.emit('action', { type: 'EvtX:Error', ...res });
           });
       });
@@ -87,6 +94,6 @@ class Reactor {
   }
 }
 
-const init = (evtx, io, config) => Promise.resolve(new Reactor(evtx, io, config));
+const init = (evtx, io, secretKey, users) => Promise.resolve(new Reactor(evtx, io, secretKey, users));
 
 export default init;

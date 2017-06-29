@@ -5,11 +5,11 @@ import initReactor from './reactor';
 const logger = debug('matcha:socketio');
 
 const init = (ctx) => {
-  const { http, services: { evtx }, config } = ctx;
+  const { http, services: { evtx }, config: { secretSentence }, models: { users } } = ctx;
   const io = socketIo(http);
-  return initReactor(evtx, io, config).then(() => {
-    logger('evtx io setup');
-    return { ...ctx };
+  return initReactor(evtx, io, secretSentence, users).then(() => {
+    logger('socketIo is setup');
+    return ctx;
   });
 };
 

@@ -23,10 +23,4 @@ module.exports = {
     confirmEmail: '/api/confirm_email',
     resetPassword: '/api/reset_password',
   },
-  optionGeocoder: {
-    provider: 'google',
-    httpAdapter: 'https', // Default
-    apiKey: 'AIzaSyC9NS3pHxPN1tr8P1bh0IlMdqfVbbe-XsA', // for Mapquest, OpenCage, Google Premier
-    formatter: null, // 'gpx', 'string', ...
-  },
 };
