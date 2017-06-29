@@ -1,7 +1,7 @@
 /* global before, it, describe */
 /* eslint func-names: 0 */
 import should from 'should';
-// import jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import R from 'ramda';
 import config from '../../../../config';
 import init from '..';
@@ -54,33 +54,31 @@ describe('service:users', () => {
     }).catch(done);
   });
 
-  // it('should update user', function (done) {
-  //   const { secretSentence, expiresIn } = config;
-  //   const matchaToken = jwt.sign({ sub: this.userId }, secretSentence, { expiresIn });
-  //   this.matchaToken = matchaToken;
-  //   const infoToUpdate = { email: 'barrielle@gmail.com' };
-  //   const params = { service: 'users', method: 'put', input: infoToUpdate };
-  //   this.evtx.run(params, { payload: { matchaToken: this.matchaToken } }).then((newUser) => {
-  //     console.log(newUser);
-  //     should(newUser.email).eql('barrielle@gmail.com');
-  //     should(newUser.id).eql(this.userId);
-  //     done();
-  //   }).catch(done);
-  // });
-  //
-  // it('should not update user', function (done) {
-  //   const infoToUpdate = { email: 'barrielle@gmail.com' };
-  //   const params = { service: 'users', method: 'put', input: infoToUpdate };
-  //   const wrongToken = this.matchaToken.toLowerCase();
-  //   this.evtx.run(params, { req: { matchaToken: wrongToken } }).then(done)
-  //   .catch(() => done());
-  // });
-  //
-  // it('should delete user', function (done) {
-  //   const params = { service: 'users', method: 'delete' };
-  //   this.evtx.run(params, { req: { matchaToken: this.matchaToken } }).then((newUser) => {
-  //     should(newUser.id).eql(this.userId);
-  //     done();
-  //   }).catch(done);
-  // });
+  it('should update user', function (done) {
+    const { secretSentence, expiresIn } = config;
+    const matchaToken = jwt.sign({ sub: this.userId }, secretSentence, { expiresIn });
+    this.matchaToken = matchaToken;
+    const infoToUpdate = { email: 'barrielle@gmail.com' };
+    const params = { service: 'users', method: 'put', input: infoToUpdate };
+    this.evtx.run(params, { req: { matchaToken: this.matchaToken } }).then((newUser) => {
+      should(newUser.id).eql(this.userId);
+      done();
+    }).catch(done);
+  });
+
+  it('should not update user', function (done) {
+    const infoToUpdate = { email: 'barrielle@gmail.com' };
+    const params = { service: 'users', method: 'put', input: infoToUpdate };
+    const wrongToken = this.matchaToken.toLowerCase();
+    this.evtx.run(params, { req: { matchaToken: wrongToken } }).then(done)
+    .catch(() => done());
+  });
+
+  it('should delete user', function (done) {
+    const params = { service: 'users', method: 'delete' };
+    this.evtx.run(params, { req: { matchaToken: this.matchaToken } }).then((newUser) => {
+      should(newUser.id).eql(this.userId);
+      done();
+    }).catch(done);
+  });
 });

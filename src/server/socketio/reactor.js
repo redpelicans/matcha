@@ -1,6 +1,6 @@
 import debug from 'debug';
 import jwt from 'jsonwebtoken';
-import R from 'ramda';
+// import R from 'ramda';
 
 const logger = debug('matcha:socketio');
 
