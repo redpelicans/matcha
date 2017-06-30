@@ -49,28 +49,18 @@ describe('service:users', () => {
     const params = { service: 'users', method: 'post', input: user };
     this.evtx.run(params).then((newUser) => {
       this.userId = newUser.id;
-      should(R.pick(['login', 'email', 'firstname', 'lastname', 'sexe', 'age'], newUser)).eql(R.omit(['password'], user));
-      done();
-    }).catch(done);
-  });
-
-  it('should confirm email user', function (done) {
-    const { secretSentence, expiresIn } = config;
-    const matchaToken = jwt.sign({ sub: this.userId }, secretSentence, { expiresIn });
-    this.matchaToken = matchaToken;
-    const params = { service: 'confirm_email', method: 'get' };
-    this.evtx.run(params, { req: { matchaToken } }).then((newUser) => {
-      should(newUser.id).type('number');
-      should(newUser.confirmed).eql(true);
+      should(R.pick(['login', 'email', 'firstname', 'lastname', 'sexe', 'age'], newUser)).eql(R.omit(['password', 'latitude', 'longitude'], user));
       done();
     }).catch(done);
   });
 
   it('should update user', function (done) {
+    const { secretSentence, expiresIn } = config;
+    const matchaToken = jwt.sign({ sub: this.userId }, secretSentence, { expiresIn });
+    this.matchaToken = matchaToken;
     const infoToUpdate = { email: 'barrielle@gmail.com' };
     const params = { service: 'users', method: 'put', input: infoToUpdate };
     this.evtx.run(params, { req: { matchaToken: this.matchaToken } }).then((newUser) => {
-      should(newUser.email).eql('barrielle@gmail.com');
       should(newUser.id).eql(this.userId);
       done();
     }).catch(done);
