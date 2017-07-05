@@ -21,9 +21,6 @@ const users = {
   delete(id) {
     return Promise.resolve({ id });
   },
-    // deleteAll() {
-    //   return this.db.any('DELETE FROM users');
-    // },
 };
 
 describe('service:users', () => {

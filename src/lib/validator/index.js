@@ -1,6 +1,6 @@
 import Joi from 'joi';
 
-const schemaRegister = Joi.object().keys({
+export const schemaRegister = Joi.object().keys({
   email: Joi.string().email(),
   login: Joi.string().alphanum().min(3).max(30).required(), //eslint-disable-line
   password: Joi.string().regex(/^(?=.*[a-zA-Z])(?=.*\W)(?=.*[0-9]).{6,25}$/).required(),
@@ -11,9 +11,11 @@ const schemaRegister = Joi.object().keys({
   sexe: Joi.string().regex(/^[A-Za-z ]{2,30}$/).required(),
 });
 
-// export const schemaLogin = Joi.object().keys({
-//   login: Joi.string().alphanum().min(3).max(30).required(), //eslint-disable-line
-//   password: Joi.string().regex(/^(?=.*[a-zA-Z])(?=.*\W)(?=.*[0-9]).{6,25}$/).required(),
-// });
+export const schemaLogin = Joi.object().keys({
+  login: Joi.string().alphanum().min(3).max(30).required(), //eslint-disable-line
+  password: Joi.string().regex(/^(?=.*[a-zA-Z])(?=.*\W)(?=.*[0-9]).{6,25}$/).required(),
+});
 
-export default schemaRegister;
+export const schemaPassword = Joi.object().keys({
+  password: Joi.string().regex(/^(?=.*[a-zA-Z])(?=.*\W)(?=.*[0-9]).{6,25}$/).required(),
+});

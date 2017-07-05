@@ -1,12 +1,14 @@
 import EvtX from 'evtx';
 import debug from 'debug';
-import initStatus from './status';
+import initAdmin from './admin';
 import initUsers from './users';
+import initLikes from './likes';
 
 const logger = debug('matcha:services');
 
 const allServices = [
-  initStatus,
+  initAdmin,
+  initLikes,
   initUsers,
 ];
 

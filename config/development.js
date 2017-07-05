@@ -19,6 +19,8 @@ module.exports = {
     database: 'matcha',
     user: 'postgres',
   },
+  configPgp: {
+  },
   routes: {
     confirmEmail: '/api/confirm_email',
     resetPassword: '/api/reset_password',

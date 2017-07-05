@@ -1,7 +1,7 @@
 import pgp from 'pg-promise';
 import EventEmitter from 'events';
 
-const pgConnector = pgp();
+
 const models = {};
 
 class Proto extends EventEmitter {
@@ -15,7 +15,8 @@ class Proto extends EventEmitter {
   }
 }
 
-export const connect = ({ postgres: config }) => {
+export const connect = ({ postgres: config, configPgp }) => {
+  const pgConnector = pgp(configPgp);
   const db = pgConnector(config);
   return db.connect()
     .then(client => {

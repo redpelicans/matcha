@@ -6,7 +6,6 @@ const addFakeAccount = () => {
 };
 
 export default addFakeAccount;
-// 
 // ('abarriel','allan.barrielle@gmail.com','$2a$10$vpiJTzmJVRLJe5qOM4T5eOtjd2jmUgV7JGM7Q5STQuXqgB6QbqAi6','allan','barrielle','men','21','heterosexual',48.8537,2.549),
 // ('lcharvol','lcharvl@gmail.com','$2a$10$vpiJTzmJVRLJe5qOM4T5eOtjd2jmUgV7JGM7Q5STQuXqgB6QbqAi6','lucals','charvol','men','52','bisexual',48.8882574,2.3168467),
 // ('jpascal','jpascal@gmail.com','$2a$10$vpiJTzmJVRLJe5qOM4T5eOtjd2jmUgV7JGM7Q5STQuXqgB6QbqAi6','julie','pascal','women','45','heterosexual',48.8856123,2.3236024),

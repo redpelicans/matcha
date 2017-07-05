@@ -6,12 +6,14 @@ import R from 'ramda';
 import config from '../../../../config';
 import users from '../../models/users';
 import initPostgres from '..';
-import loadSchema from '../loadSchema';
+import loadUserSchema from '../loadUserSchema';
+// import loadEventSchema from '../loadEventSchema';
 
 describe('models:users:method', () => {
   before(function () {
     return initPostgres({ config, startTime: new Date() })
-    .then(loadSchema)
+    .then(loadUserSchema)
+    // .then(loadEventSchema)
     .then((ctx) => users.deleteAll().then(() => ctx))
     .then(ctx => {
       this.ctx = ctx;

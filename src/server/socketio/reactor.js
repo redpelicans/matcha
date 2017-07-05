@@ -1,6 +1,5 @@
 import debug from 'debug';
 import jwt from 'jsonwebtoken';
-// import R from 'ramda';
 
 const logger = debug('matcha:socketio');
 
@@ -8,7 +7,6 @@ const formatServiceMethod = (ctx) => {
   const { service, method, message: { type, payload } } = ctx;
   if (service && method) return Promise.resolve(ctx);
   const [serv, meth] = type.split(':');
-  // console.log(payload, serv, meth);
   return Promise.resolve({
     ...ctx,
     input: payload,
@@ -37,7 +35,6 @@ const getToken = (ctx) => {
 
 const getUserFromToken = (ctx) => {
   const { globals: { config: { secretSentence }, models: { users } }, matchaToken } = ctx;
-  // const { config: { httpCode: { Unauthorized } } } = ctx.globals;
   if (!matchaToken) return Promise.resolve(ctx);
   const dataDecoded = jwt.verify(matchaToken, secretSentence);
   if (!dataDecoded) return Promise.resolve(ctx);
@@ -45,11 +42,12 @@ const getUserFromToken = (ctx) => {
 };
 
 class Reactor {
-  constructor(evtx, io, secretKey, users) {
+  constructor(evtx, io, secretKey, users, likes) {
     this.io = io;
     this.secretKey = secretKey;
     this.evtx = evtx;
     this.users = users;
+    this.likes = likes;
     this.sockets = {};
     this.initModels();
     this.initEvtX();
@@ -67,12 +65,27 @@ class Reactor {
       logger(`user ${user.firstname} logged out`);
       delete this.sockets[socket.id];
     };
+    const addLike = ({ from, to, push }) => {
+      logger(from, to, push);
+    };
+
+    const unLike = ({ from, to }) => {
+      logger(from, to);
+    };
+
     this.users.on('login', registerUser);
     this.users.on('logout', logoutUser);
+    this.likes.on('addLike', addLike);
+    this.likes.on('unLike', unLike);
   }
 
   getConnectedUsers() {
-    logger(this.sockets);
+    logger('getConnectedUsers');
+    const usersConnected = [];
+    Object.values(this.sockets).forEach(user => {
+      usersConnected.push(user.id);
+    });
+    return usersConnected;
   }
 
   initEvtX() {
@@ -86,11 +99,11 @@ class Reactor {
     io.on('connection', (socket) => {
       socket.on('action', (message) => {
         logger(`receive ${message.type} action`);
-        const localCtx = { io, socket };
+        const usersConnected = this.getConnectedUsers();
+        const localCtx = { io, socket, usersConnected };
         evtx.run(message, localCtx)
           .then((res) => {
             socket.emit('action', res);
-            // this.getConnectedUsers();
             logger(`sent ${res.type} action`);
           })
           .catch((err) => {
@@ -105,6 +118,9 @@ class Reactor {
   }
 }
 
-const init = (evtx, io, secretKey, users) => Promise.resolve(new Reactor(evtx, io, secretKey, users));
+const init = ((evtx, io, secretKey, users, likes) => {
+  const reactor = new Reactor(evtx, io, secretKey, users, likes);
+  return Promise.resolve({ getConnectedUsers() { return reactor.getConnectedUsers(); } });
+});
 
 export default init;

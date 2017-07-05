@@ -1,14 +1,16 @@
 import R from 'ramda';
 
 const service = {
-  name: 'status',
+  name: 'admin',
   ping() {
     return Promise.resolve({ ping: 'pong' });
   },
-  get() {
+  status() {
     const { startTime, config: { postgres }, models: { users } } = this.globals;
+    // const connectedUsers = reactor.getConnectedUsers();
     return users.ping().then(() => ({
       startTime,
+      // connectedUsers,
       postgres: { ...R.omit('password', postgres), ping: 'pong' },
     }));
   },

@@ -20,16 +20,19 @@ describe('functional', () => {
       .then((ctx) => {
         const { http: { url } } = ctx;
         this.ctx = ctx;
-        this.userId = 0;
+        this.allanId = 0;
+        this.kylieId = 0;
         this.url = url;
         this.matchaToken = '';
+        this.allanToken = '';
+        this.kylieToken = '';
       });
   });
 
   it('should ping', function (done) {
     const data = 'pong';
     const message = {
-      type: 'status:ping',
+      type: 'admin:ping',
       payload: { data },
       replyTo: 'pong',
     };
@@ -42,9 +45,9 @@ describe('functional', () => {
     });
   });
 
-  it('should print status', function (done) {
+  it('should print status admin', function (done) {
     const message = {
-      type: 'status:get',
+      type: 'admin:status',
       payload: {},
       replyTo: 'get',
     };
@@ -78,14 +81,14 @@ describe('functional', () => {
       should(payload).type('object');
       should(payload.id).type('number');
       should(R.pick(['login', 'email', 'firstname', 'lastname', 'sexe', 'age'], payload)).eql(R.omit(['password'], user));
-      this.userId = payload.id;
+      this.allanId = payload.id;
       done();
     });
   });
 
   it('should confirm email user', function (done) {
     const { secretSentence, expiresIn, routes: { confirmEmail } } = config;
-    const matchaToken = jwt.sign({ sub: this.userId }, secretSentence, { expiresIn });
+    const matchaToken = jwt.sign({ sub: this.allanId }, secretSentence, { expiresIn });
     this.matchaToken = matchaToken;
     const url = `${this.ctx.http.url}/${confirmEmail}`;
     axios({ method: 'get', url, params: { matchaToken } })
@@ -94,42 +97,6 @@ describe('functional', () => {
       done();
     })
     .catch(done);
-  });
-
-  it('should login an user', function (done) {
-    const data = {
-      login: 'abarriel',
-      password: 'password!1',
-    };
-    const message = {
-      type: 'users:login',
-      payload: data,
-      replyTo: 'put',
-    };
-    const io = socketIOClient.connect(this.url);
-    io.emit('action', message);
-    io.on('action', ({ payload }) => {
-      should(payload).type('string');
-      done();
-    });
-  });
-
-  it('should login an user', function (done) {
-    const data = {
-      login: 'abarriel',
-      password: 'password!1',
-    };
-    const message = {
-      type: 'users:login',
-      payload: data,
-      replyTo: 'put',
-    };
-    const io = socketIOClient.connect(this.url);
-    io.emit('action', message);
-    io.on('action', ({ payload }) => {
-      should(payload).type('string');
-      done();
-    });
   });
 
   it('should update user', function (done) {
@@ -146,6 +113,125 @@ describe('functional', () => {
     io.emit('action', message);
     io.on('action', ({ payload }) => {
       should(payload.email).eql('barrielle@gmail.com');
+      done();
+    });
+  });
+
+  it('should add an other user', function (done) {
+    const user = {
+      login: 'kjenner',
+      email: 'kjenner@gmail.com',
+      password: 'password!1',
+      firstname: 'kylie',
+      lastname: 'jenner',
+      sexe: 'women',
+      age: '21',
+    };
+    const message = {
+      type: 'users:post',
+      payload: user,
+      replyTo: 'post',
+    };
+    const io = socketIOClient.connect(this.url);
+    io.emit('action', message);
+    io.on('action', res => {
+      const { payload } = res;
+      should(payload).type('object');
+      should(payload.id).type('number');
+      should(R.pick(['login', 'email', 'firstname', 'lastname', 'sexe', 'age'], payload)).eql(R.omit(['password'], user));
+      this.kylieId = payload.id;
+      done();
+    });
+  });
+
+  it('should confirm email of the second user', function (done) {
+    const { secretSentence, expiresIn, routes: { confirmEmail } } = config;
+    const matchaToken = jwt.sign({ sub: this.kylieId }, secretSentence, { expiresIn });
+    this.matchaToken = matchaToken;
+    const url = `${this.ctx.http.url}/${confirmEmail}`;
+    axios({ method: 'get', url, params: { matchaToken } })
+    .then(({ data: user }) => {
+      should(user.confirmed).eql(true);
+      done();
+    })
+    .catch(done);
+  });
+
+  it('should log abarriel in', function (done) {
+    const data = {
+      login: 'abarriel',
+      password: 'password!1',
+    };
+    const message = {
+      type: 'users:login',
+      payload: data,
+      replyTo: 'put',
+    };
+    const io = socketIOClient.connect(this.url);
+    io.emit('action', message);
+    io.on('action', ({ payload }) => {
+      this.allanToken = payload;
+      should(payload).type('string');
+      done();
+    });
+  });
+
+  it('should log kjenner in', function (done) {
+    const data = {
+      login: 'kjenner',
+      password: 'password!1',
+    };
+    const message = {
+      type: 'users:login',
+      payload: data,
+      replyTo: 'put',
+    };
+    const io = socketIOClient.connect(this.url);
+    io.emit('action', message);
+    io.on('action', ({ payload }) => {
+      this.kylieToken = payload;
+      should(payload).type('string');
+      done();
+    });
+  });
+// LIKES
+
+  it('should add likes', function (done) {
+    const data = {
+      from: this.allanId,
+      to: this.kylieId,
+    };
+    const message = {
+      type: 'likes:addLike',
+      payload: data,
+      matchaToken: this.allanToken,
+      replyTo: 'pong',
+    };
+    const io = socketIOClient.connect(this.url);
+    io.emit('action', message);
+    io.on('action', ({ payload }) => {
+      should(Number(payload.to_user)).eql(this.kylieId);
+      should(Number(payload.from_user)).eql(this.allanId);
+      done();
+    });
+  });
+
+  it('should remove likes', function (done) {
+    const data = {
+      from: this.allanId,
+      to: this.kylieId,
+    };
+    const message = {
+      type: 'likes:unLike',
+      payload: data,
+      matchaToken: this.allanToken,
+      replyTo: 'pong',
+    };
+    const io = socketIOClient.connect(this.url);
+    io.emit('action', message);
+    io.on('action', ({ payload }) => {
+      should(Number(payload.to_user)).eql(this.kylieId);
+      should(Number(payload.from_user)).eql(this.allanId);
       done();
     });
   });

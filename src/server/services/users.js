@@ -1,11 +1,18 @@
 import R from 'ramda';
 import bcrypt from 'bcrypt-as-promised';
 import jwt from 'jsonwebtoken';
-import { validateRegisterForm, getIp, getLocalisation, checkAuth, getInfoToUpdate, sendConfirmEmail, getToken, getByEmail } from './hooks';
+import { validateLoginForm, validateRegisterForm, getIp,
+  getLocalisation, checkAuth, getInfoToUpdate, sendConfirmEmail, getToken, getByEmail } from './hooks';
 import { loadProfil, filterBySexeAge, cleanUser, sortGeoLoc } from './hooks/suggestion';
 
 const service = {
   name: 'users',
+
+  logout(user) {
+    const { socket } = this.locals;
+    const { models: { users } } = this.globals;
+    users.emit('logout', { user, socket });
+  },
 
   login({ user, password }) {
     const { models: { users } } = this.globals;
@@ -25,7 +32,6 @@ const service = {
 
   delete({ id }) {
     const { models: { users } } = this.globals;
-
     return users.delete(Number(id));
   },
 
@@ -45,7 +51,8 @@ const init = (evtx) => evtx
   .use(service.name, service)
   .service(service.name)
   .before({
-    login: [getByEmail],
+    logout: [checkAuth],
+    login: [validateLoginForm, getByEmail],
     suggestion: [checkAuth, loadProfil, filterBySexeAge, cleanUser, sortGeoLoc],
     get: [checkAuth],
     post: [validateRegisterForm, getIp, getLocalisation],
