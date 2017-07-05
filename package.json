@@ -8,13 +8,18 @@
   "license": "MIT",
   "scripts": {
     "lint": "eslint src --color",
-    "srv:dev": "NODE_ENV=development DEBUG=matcha* nodemon --watch config --watch src/server --exec 'babel-node src/server'",
-    "srv:prod": "NODE_ENV=production babel src --out-dir dist/",
-    "srv:run": "NODE_ENV=production DEBUG=sfs*,evtx* node dist/server/cluster",
-    "load:data": "NODE_ENV=development DEBUG=matcha* babel-node ./scripts/load_data",
-    "reset:data": "NODE_ENV=testing DEBUG=matcha* babel-node ./scripts/reset_data",
-    "test": "NODE_ENV=testing DEBUG=matcha* mocha --require babel-core/register --reporter spec \"./src/**/__test__/*.js\" ",
-    "coverage": "NODE_ENV=testing nyc yarn test"
+    "srv:dev": "cross-env NODE_ENV=development DEBUG=matcha* nodemon --watch config/server --watch src/server --exec 'babel-node src/server'",
+    "srv:prod": "cross-env NODE_ENV=production babel src --out-dir dist/",
+    "srv:run": "cross-env NODE_ENV=production DEBUG=sfs*,evtx* node dist/server/cluster",
+    "load:data": "cross-env NODE_ENV=development DEBUG=matcha* babel-node ./scripts/load_data",
+    "reset:data": "cross-env NODE_ENV=testing DEBUG=matcha* babel-node ./scripts/reset_data",
+    "srv:test": "cross-env NODE_ENV=testing DEBUG=matcha* mocha --require babel-core/register --reporter spec \"./src/server/**/__test__/*.js\" ",
+    "client:test": "cross-env NODE_ENV=testing mocha --require ignore-styles --require babel-core/register --reporter spec \"./src/client/**/__test__/*.js\" ",
+    "coverage": "NODE_ENV=testing nyc yarn test",
+    "build:prod": "cross-env NODE_ENV=production webpack -p --config webpack.config.js --progress",
+    "build:dev": "cross-env NODE_ENV=development webpack-dev-server --progress --config webpack.config.js",
+    "bundle:stats": "cross-env NODE_ENV=production webpack -p --config webpack.config.js --profile --json > stats.json",
+    "bundle:analyse": "webpack-bundle-analyzer ./stats.json ./build --report --mode=static"
   },
   "dependencies": {
     "axios": "^0.16.2",
@@ -33,28 +38,51 @@
     "nodemailer": "^4.0.1",
     "pg-promise": "^5.9.3",
     "ramda": "^0.24.1",
-    "should": "^11.2.1",
     "socket.io-client": "^2.0.3",
-    "socket.io": "^1.0.0"
+    "socket.io": "^1.0.0",
+    "react": "^15.0.2",
+    "react-dom": "^15.0.2",
+    "react-redux": "^4.4.5",
+    "redux": "^3.5.2",
+    "redux-logger": "^2.6.1",
+    "redux-thunk": "^2.0.1",
+    "universal-fetch": "^1.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
     "babel-core": "^6.25.0",
     "babel-eslint": "^7.2.3",
-    "babel-preset-latest": "^6.24.1",
-    "babel-preset-stage-0": "^6.24.1",
+    "babel-loader": "^6.2.8",
+    "babel-preset-latest": "^6.16.0",
+    "babel-preset-react": "^6.16.0",
+    "babel-preset-stage-0": "^6.16.0",
+    "cross-env": "^3.2.4",
+    "css-loader": "^0.26.1",
+    "enzyme": "^2.6.0",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^14.1.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^3.0.2",
     "eslint-plugin-react": "^6.9.0",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "ignore-styles": "^5.0.1",
     "mocha": "^3.4.2",
     "nodemon": "^1.11.0",
     "nyc": "^11.0.2",
-    "sinon": "^2.3.4"
+    "sinon": "^2.3.4",
+    "redux-devtools": "^3.3.1",
+    "redux-devtools-dock-monitor": "^1.1.1",
+    "redux-devtools-log-monitor": "^1.1.1",
+    "should": "^11.2.1",
+    "style-loader": "^0.13.1",
+    "webpack": "^2.2.1",
+    "webpack-bundle-analyzer": "^2.3.0",
+    "webpack-dev-server": "^2.4.1"
   },
   "nyc": {
-    "exclude": []
+    "exclude": [
+      "build"
+    ]
   },
   "babel": {
     "presets": [
@@ -64,7 +92,8 @@
           "modules": false
         }
       ],
-      "stage-0"
+      "stage-0",
+      "react"
     ]
   }
 }
