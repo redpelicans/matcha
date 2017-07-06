@@ -3,7 +3,7 @@
 import should from 'should';
 import jwt from 'jsonwebtoken';
 import R from 'ramda';
-import config from '../../../../config';
+import config from '../../../../config/server';
 import init from '..';
 
 const users = {

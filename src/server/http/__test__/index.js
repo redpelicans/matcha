@@ -3,7 +3,7 @@
 import axios from 'axios';
 import should from 'should';
 import initHttp from '..';
-import config from '../../../../config';
+import config from '../../../../config/server';
 
 describe('http:ping', () => {
   before(function () {

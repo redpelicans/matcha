@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 import axios from 'axios';
 import socketIOClient from 'socket.io-client';
 import run from '../run';
-import config from '../../../config';
+import config from '../../../config/server';
 import addFakeAccounts from '../postgres/__test__/addFakeAccounts';
 
 describe('functional', () => {

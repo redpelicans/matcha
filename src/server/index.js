@@ -1,5 +1,5 @@
 import debug from 'debug';
-import config from '../../config';
+import config from '../../config/server';
 import run from './run';
 
 const logger = debug('matcha:server/index.js');
