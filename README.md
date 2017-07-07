@@ -32,11 +32,16 @@ And launch your preferred browser on http://0.0.0.0:3001
 - SoC, Separation of Concerns
 - SST, single source of truth
 
-- [ ] React
-- [ ] Redux
-- [ ] React/Redux
-- [ ] Redux middleware
+- [ ] React ([lifecycle](https://facebook.github.io/react/docs/react-component.html), mouting point)
+- [ ] React/Redux (provider, connect)
+- [ ] Redux (store, reducers, actions, selectors)
 - [ ] Thunk
+- [ ] Redux middleware
 - [ ] EvtX middleware
 
-true-false
+### friday
+
+- list of authors
+- author {id, name, country}
+- add, remove
+- thunks: async action, sequence of actions
