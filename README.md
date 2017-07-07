@@ -38,3 +38,5 @@ And launch your preferred browser on http://0.0.0.0:3001
 - [ ] Redux middleware
 - [ ] Thunk
 - [ ] EvtX middleware
+
+false
