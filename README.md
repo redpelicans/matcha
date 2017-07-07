@@ -24,3 +24,17 @@ Content not from webpack is served from ./public
 ```
 
 And launch your preferred browser on http://0.0.0.0:3001
+
+## training
+
+- DRY, don't repeat yourself
+- LoD, Law of Demeter
+- SoC, Separation of Concerns
+- SST, single source of truth
+
+- [ ] React
+- [ ] Redux
+- [ ] React/Redux
+- [ ] Redux middleware
+- [ ] Thunk
+- [ ] EvtX middleware
