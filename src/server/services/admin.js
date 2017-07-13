@@ -3,7 +3,10 @@ import R from 'ramda';
 const service = {
   name: 'admin',
   ping() {
-    return Promise.resolve({ ping: 'pong' });
+    return new Promise((resolve, reject) => {
+      setTimeout(() => resolve({ ping: 'pong' }), 2000)
+    });
+    //return Promise.resolve({ ping: 'pong' });
   },
   status() {
     const { startTime, config: { postgres }, models: { users } } = this.globals;

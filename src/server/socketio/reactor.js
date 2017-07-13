@@ -108,9 +108,8 @@ class Reactor {
           })
           .catch((err) => {
             let res = {};
-            if (!err.status) {
-              res = { details: err.detail, routine: err.routine };
-            } else res = { status: err.status };
+            if (!err.status) res = { details: err.details, routine: err.routine, message: err.message };
+            else res = { status: err.status };
             socket.emit('action', { type: 'EvtX:Error', ...res });
           });
       });
