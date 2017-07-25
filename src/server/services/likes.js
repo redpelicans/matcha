@@ -3,7 +3,7 @@ import { ifAlreadyLiked, ifCanLike, ifConnected } from './hooks/likes';
 
 const service = {
   name: 'likes',
-  addLike({ from, to, push }) {
+  addLike({ idUser: { from, to }, push }) {
     const { models: { likes } } = this.globals;
     const data = { from_user: from, to_user: to, date: Date.now(), push };
     return likes.add(data).then(resp => {
@@ -11,7 +11,7 @@ const service = {
       return Promise.resolve(resp);
     });
   },
-  unLike({ from, to }) {
+  unLike({ idUser: { from, to } }) {
     const { models: { likes } } = this.globals;
     return likes.delete(from, to).then(resp => {
       likes.emit('unLike', { from, to });

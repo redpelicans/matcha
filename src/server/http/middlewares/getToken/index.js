@@ -1,6 +1,7 @@
 const getToken = () => (req, res, next) => {
-  const token = req.query.matchaToken;
-  req.matchaToken = token;
+  const { matchaToken: token } = req.query;
+  const { matchaToken } = req.body;
+  req.matchaToken = matchaToken || token;
   next();
 };
 

@@ -4,9 +4,3 @@ import addFakeAccount from './addFakeAccount';
 
 initPostgres({ config })
   .then(addFakeAccount);
-  // .then((ctx) => {
-  //   const { db } = ctx;
-  //   // console.log(db.cle);
-  //   db.client.end();
-  // })
-  // // .then()

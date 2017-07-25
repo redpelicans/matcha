@@ -19,3 +19,8 @@ export const schemaLogin = Joi.object().keys({
 export const schemaPassword = Joi.object().keys({
   password: Joi.string().regex(/^(?=.*[a-zA-Z])(?=.*\W)(?=.*[0-9]).{6,25}$/).required(),
 });
+
+export const schemaResetPassword = Joi.object().keys({
+  matchaToken: Joi.string().min(110).max(120).required(), //eslint-disable-line
+  password: Joi.string().regex(/^(?=.*[a-zA-Z])(?=.*\W)(?=.*[0-9]).{6,25}$/).required(),
+});

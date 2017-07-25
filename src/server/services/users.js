@@ -1,9 +1,11 @@
 import R from 'ramda';
 import bcrypt from 'bcrypt-as-promised';
 import jwt from 'jsonwebtoken';
+import geolib from 'geolib';
 import { validateLoginForm, validateRegisterForm, getIp,
   getLocalisation, checkAuth, getInfoToUpdate, sendConfirmEmail, getToken, getByEmail } from './hooks';
-import { loadProfil, filterBySexeAge, cleanUser, sortGeoLoc } from './hooks/suggestion';
+import { loadProfil, filterBySexeAge, cleanUser, sortGeoLoc, reduceUsers, buildUsers } from './hooks/suggestion';
+
 
 const service = {
   name: 'users',
@@ -21,15 +23,25 @@ const service = {
       const token = jwt.sign({ sub: user.id }, secretSentence, { expiresIn });
       const { socket } = this.locals;
       users.emit('login', { user, socket });
-      return token;
+      return { matchaToken: token, id: user.id };
     });
   },
 
   get({ id }) {
     const { models: { users } } = this.globals;
-    return users.load(Number(id)).then((user) => R.omit('password', user));
+    return users.load(Number(id)).then((userLoad) => R.omit('password', userLoad));
   },
 
+  getUser({ idUser, user }) {
+    const { models: { users } } = this.globals;
+    return users.load(Number(idUser)).then((userLoad) => {
+      const distance = geolib.getDistance(
+        { latitude: userLoad.latitude, longitude: userLoad.longitude },
+        { latitude: user.latitude, longitude: user.longitude });
+      const userloaded = { ...userLoad, distance };
+      return R.omit('password', userloaded);
+    });
+  },
   delete({ id }) {
     const { models: { users } } = this.globals;
     return users.delete(Number(id));
@@ -43,8 +55,21 @@ const service = {
 
   put({ id: { id }, infoToUpdate }) {
     const { models: { users } } = this.globals;
-    return users.update(infoToUpdate, Number(id));
+    const info = R.filter((single) => {
+      if (typeof single === 'object' && single.length !== 0) return true;
+      if (typeof single === 'string' && single !== '') return true;
+    }, infoToUpdate);
+    return users.update(info, Number(id));
   },
+
+  suggestion({ users }) {
+    return Promise.resolve({ listUser: users });
+  },
+
+  isCheckAndConnected({ user }) {
+    return Promise.resolve({ user });
+  },
+
 };
 
 const init = (evtx) => evtx
@@ -53,11 +78,13 @@ const init = (evtx) => evtx
   .before({
     logout: [checkAuth],
     login: [validateLoginForm, getByEmail],
-    suggestion: [checkAuth, loadProfil, filterBySexeAge, cleanUser, sortGeoLoc],
+    suggestion: [checkAuth, loadProfil, filterBySexeAge, cleanUser, sortGeoLoc, reduceUsers, buildUsers],
     get: [checkAuth],
+    getUser: [checkAuth],
     post: [validateRegisterForm, getIp, getLocalisation],
     put: [checkAuth, getInfoToUpdate],
     delete: [getToken, checkAuth],
+    isCheckAndConnected: [getToken, checkAuth],
   })
   .after({
     post: [sendConfirmEmail],

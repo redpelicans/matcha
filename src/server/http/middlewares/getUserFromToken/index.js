@@ -11,7 +11,8 @@ const getUserFromToken = (config) => (req, res, next) => {
     .then(user => {
       req.user = user;
       return next();
-    });
+    })
+    .catch(err => next(err));
 };
 
 export default getUserFromToken;

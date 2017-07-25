@@ -1,4 +1,5 @@
-// import geolib from 'geolib';
+import geolib from 'geolib';
+import R from 'ramda';
 
 const whichSexe = (sexe, orientation) => {
   if (orientation === 'homosexual') return [sexe];
@@ -12,7 +13,6 @@ const whichAge = (age, range) => ([Number(age) - range, Number(age) + range]);
 export const loadProfil = (ctx) => {
   const { globals: { models: { users } }, input: { id } } = ctx;
   const { config: { httpCode: { Unauthorized } } } = ctx.globals;
-  console.log('loadProfil'); // eslint-disable-line
   return users.load(id).then(user => {
     if (!user || !user.confirmed) return Promise.reject({ status: Unauthorized });
     const lookingFor = {};
@@ -29,8 +29,8 @@ export const loadProfil = (ctx) => {
     lookingFor.sexe = whichSexe(sexe, orientation);
     lookingFor.age = whichAge(age, 10);
     lookingFor.interest = interest;
-    lookingFor.userLongitude = longitude;
-    lookingFor.userLatitude = latitude;
+    lookingFor.longitude = longitude;
+    lookingFor.latitude = latitude;
     lookingFor.country = country;
     lookingFor.city = city;
     return Promise.resolve({ ...ctx, input: lookingFor });
@@ -46,25 +46,43 @@ export const filterBySexeAge = (ctx) => {
 export const cleanUser = (ctx) => {
   const { users, lookingFor } = ctx.input;
   const userClean = users.filter(user => { // eslint-disable-line
-    if (user.orientation === 'bisexual') return user;
-    if (user.orientation === 'homosexual' && user.sexe === lookingFor.mySexe) return user;
+    if (!user.confirmed) return false;
+    if (user.orientation === 'bisexual') return true;
+    if (user.orientation === 'homosexual' && user.sexe === lookingFor.mySexe) return true;
     if (user.orientation === 'heterosexual') {
-      if (lookingFor.sexe.includes('men') && user.sexe === 'women') return user;
-      if (lookingFor.sexe.includes('women') && user.sexe === 'men') return user;
+      if (lookingFor.sexe.includes('men') && user.sexe === 'women') return true;
+      if (lookingFor.sexe.includes('women') && user.sexe === 'men') return true;
     }
   });
   return Promise.resolve({ ...ctx, input: { users: userClean, lookingFor } });
 };
 
-// export const sortGeoLoc = (ctx) => {
-  // const { users, lookingFor } = ctx.input;
-  // const userClean = users.filter(user => {
-  //   if (user.orientation === 'bisexual') return user;
-  //   if (user.orientation === 'homosexual' && user.sexe === lookingFor.mySexe) return user;
-  //   if (user.orientation === 'heterosexual') {
-  //     if (lookingFor.sexe.includes('men') && user.sexe === 'women') return user;
-  //     if (lookingFor.sexe.includes('women') && user.sexe === 'men') return user;
-  //   }
-  // });
-  // return userClean;
-// };
+export const sortGeoLoc = (ctx) => {
+  const { users, lookingFor } = ctx.input;
+  const usersSortbyDistance = geolib.orderByDistance(lookingFor, users);
+  return Promise.resolve({ ...ctx, input: { ...ctx.input, usersSortbyDistance } });
+};
+
+export const reduceUsers = (ctx) => {
+  const { usersSortbyDistance } = ctx.input;
+  const listUsersSort = R.take(15, usersSortbyDistance);
+  const whoShouldStay = listUsersSort.map((value) => Number(value.key));
+  return Promise.resolve({ ...ctx, input: { ...ctx.input, whoShouldStay, usersSortbyDistance: listUsersSort } });
+};
+
+export const buildUsers = (ctx) => {
+  const { usersSortbyDistance, users, whoShouldStay } = ctx.input;
+  let index = -1;
+  let listUsersSort = users.map(user => { // eslint-disable-line
+    index++; // eslint-disable-line
+    if (whoShouldStay.includes(index)) {
+      let distance = '0';
+      usersSortbyDistance.forEach(userSorted => {
+        if (Number(userSorted.key) === index) distance = userSorted.distance;
+      });
+      return { ...user, distance };
+    }
+  });
+  listUsersSort = listUsersSort.filter(user => user);
+  return Promise.resolve({ ...ctx, input: { users: listUsersSort } });
+};

@@ -1,0 +1,121 @@
+.home-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.register-container {
+  font-size: 1.5vw;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+}
+
+.input--text {
+  font-size: 1vw;
+  border:1px;
+  padding:8px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  display:block;
+  border-bottom:1px solid #ccc;
+  width:100%;
+  border-radius:5px;
+}
+.navbar-top-right {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+}
+.float-left {
+  float: left;
+}
+
+.float-right {
+  float: right;
+}
+
+.register-form-container input:focus {
+  outline: none;
+}
+
+.register-form-container select:focus {
+  outline: none;
+}
+
+.register-form-container option:focus {
+  outline-color: -webkit-focus-ring-color;
+  outline-style: auto;
+  outline-width: 15px;
+}
+
+.register-form-container select {
+  font-size: 1.5vh;
+  border: none;
+  padding:9px 0;
+  width:100%;
+  width: 100%;
+  background-color: white;
+}
+
+.tagsField {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  cursor: default;
+  justify-content:space-around;
+}
+.tagField {
+  user-select: none;
+  decoration: none;
+}
+.button {
+  border:none;
+  background: white;
+  padding: 15px 32px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition-duration: 0.4s;
+}
+.label-radio{
+  margin-right: 80px;
+}
+.button {
+  color: black;
+  font-weight: bold;
+  margin: 10px;
+  text-decoration: none;
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+.second--button {
+  margin: 5px;
+  font-size: 1vw;
+  float: left;
+  color: white;
+  text-decoration: none;
+}
+
+.textarea {
+  font-size: 1vw;
+  border:1px;
+  padding:8px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  display:block;
+  border-bottom:1px solid #ccc;
+  width:100%;
+  border-radius:5px;
+}
+
+.label-file {
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+}
+
+.input-file {
+    display: none;
+}

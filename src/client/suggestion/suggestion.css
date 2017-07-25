@@ -1,0 +1,35 @@
+.container-suggestion{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-content: space-between;
+}
+
+.suggestion-box {
+    color: black;
+    font-family: 'Montserrat';
+    margin-bottom: 10px;
+    border-radius: 10px;
+    background-color: white;
+    overflow:auto;
+    max-width:450px;
+    max-height: 450px;
+    cursor: pointer;
+      user-select: none; 
+}
+
+.picture--suggestion {
+  max-width: 300px;
+  max-height: 300px;
+}
+
+.name-bio-suggestion {
+  margin: 10px;
+}
+
+.bold {
+  font-weight: bold;
+}
+.center {
+  text-align: center;
+}

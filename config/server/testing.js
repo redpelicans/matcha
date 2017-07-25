@@ -3,7 +3,7 @@ const path = require('path');
 
 module.exports = {
   secret: {
-    path: path.join(__dirname, '../etc/secret.js'),
+    path: path.join(__dirname, '../../etc/secret.js'),
   },
   httpCode: {
     Unauthorized: 201, // 401
@@ -24,6 +24,6 @@ module.exports = {
   },
   routes: {
     confirmEmail: 'confirm_email',
-    resetPassword: 'api/reset_password',
+    resetPassword: 'reset_password',
   },
 };

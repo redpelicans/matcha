@@ -44,17 +44,17 @@ export const checkIfConfirmed = (ctx) => {
 };
 
 export const sendConfirmEmail = (ctx) => {
-  if (process.env.NODE_ENV === 'testing') return Promise.resolve(ctx);
+  // if (process.env.NODE_ENV === 'testing') return Promise.resolve(ctx);
   const {
     input: { email },
-    globals: { config: { secretSentence, expiresIn, routes: { confirmEmail } } },
+    globals: { config: { secretSentence, expiresIn, server, routes: { confirmEmail } } },
     output: { id },
-    locals: { req: { connection: { server: { url } } } },
   } = ctx;
+  const getUrl = `http://${server.host}:${server.port}`;
   const token = jwt.sign({ sub: id }, secretSentence, { expiresIn });
   mailer(email,
     'Registration - Matcha',
-    `Click to confirm your email:  ${url}/${confirmEmail}?token=${token}`);
+    `Click to confirm your email:  ${getUrl}${confirmEmail}?matchaToken=${token}`);
   return Promise.resolve(ctx);
 };
 
@@ -70,7 +70,7 @@ export const checkAuth = (ctx) => {
   if (!matchaToken) return Promise.reject({ status: Unauthorized });
   const tokenDataDecoded = jwt.verify(matchaToken, secretSentence);
   if (!tokenDataDecoded) return Promise.reject({ status: Unauthorized });
-  return Promise.resolve({ ...ctx, input: { ...ctx.input, id: tokenDataDecoded.sub } });
+  return Promise.resolve({ ...ctx, input: { idUser: ctx.input, id: tokenDataDecoded.sub, user: ctx.user } });
 };
 
 export const getInfoToUpdate = (ctx) => {

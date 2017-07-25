@@ -1,7 +1,7 @@
 import debug from 'debug';
 import jwt from 'jsonwebtoken';
 
-const logger = debug('matcha:socketio');
+const logger = debug('matcha:socketio:reactor');
 
 const formatServiceMethod = (ctx) => {
   const { service, method, message: { type, payload } } = ctx;
@@ -34,7 +34,8 @@ const getToken = (ctx) => {
 };
 
 const getUserFromToken = (ctx) => {
-  const { globals: { config: { secretSentence }, models: { users } }, matchaToken } = ctx;
+  const { globals: { config: { secretSentence }, models: { users } }, matchaToken, message: { type } } = ctx;
+  if (type === 'users:post' || type === 'users:login') return Promise.resolve(ctx);
   if (!matchaToken) return Promise.resolve(ctx);
   const dataDecoded = jwt.verify(matchaToken, secretSentence);
   if (!dataDecoded) return Promise.resolve(ctx);
@@ -57,7 +58,6 @@ class Reactor {
 
   initModels() {
     const registerUser = ({ user, socket }) => {
-      // console.log(socket);
       logger(`user ${user.firstname} logged in socket.id = ${socket.id}`);
       this.sockets[socket.id] = user;
     };
@@ -72,7 +72,6 @@ class Reactor {
     const unLike = ({ from, to }) => {
       logger(from, to);
     };
-
     this.users.on('login', registerUser);
     this.users.on('logout', logoutUser);
     this.likes.on('addLike', addLike);
@@ -98,18 +97,24 @@ class Reactor {
     const { evtx, io } = this;
     io.on('connection', (socket) => {
       socket.on('action', (message) => {
+        logger(message);
         logger(`receive ${message.type} action`);
-        const usersConnected = this.getConnectedUsers();
-        const localCtx = { io, socket, usersConnected };
+        const localCtx = { io, socket, usersConnected: this.getConnectedUsers.bind(this) };
         evtx.run(message, localCtx)
           .then((res) => {
-            socket.emit('action', res);
+            const connected = this.getConnectedUsers();
+            if (res.type === 'isConnected') {
+              if (connected.includes(res.payload.user.id)) return socket.emit('action', { ...res, payload: { ...res.payload, connected: true } });
+              return socket.emit('action', { ...res, payload: { ...res.payload, connected: false } });
+            }
             logger(`sent ${res.type} action`);
+            socket.emit('action', { ...res, payload: { ...res.payload, connected } });
+            // console.log(res);
           })
           .catch((err) => {
             let res = {};
             if (!err.status) {
-              res = { details: err.detail, routine: err.routine };
+              res = { status: err.detail, routine: err.routine };
             } else res = { status: err.status };
             socket.emit('action', { type: 'EvtX:Error', ...res });
           });
