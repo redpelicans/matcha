@@ -1,17 +1,23 @@
 import jwt from 'jsonwebtoken';
 import users from '../../../models/users';
 
-const checkToken = (req, res, next) => {
-  if (!req.matchaToken) return next({ status: 201 });
-  const decoded = jwt.decode(req.matchaToken);
-  const { sub } = decoded;
-  req.id = sub;
-  users.load(sub)
-    .then((user) => jwt.verify(req.matchaToken, user.password, (err) => {
-      if (err) return next({ status: 201 });
-      req.secret = user.password;
-      next();
-    }));
+const checkToken = async (ctx, next) => {
+  try {
+    const { matchaToken } = ctx;
+    if (!matchaToken) throw (new Error());
+    const decoded = jwt.decode(matchaToken);
+    const { sub } = decoded;
+    ctx.id = sub;
+    const user = await users.load(sub);
+    jwt.verify(matchaToken, user.password);
+    ctx.secret = user.password;
+    await next();
+  } catch (err) {
+    if (err.name === 'JsonWebTokenError') return next();
+    ctx.status = err.status || 201;
+    ctx.body = 'Failed to authenticate';
+    throw err;
+  }
 };
 
 export default checkToken;

@@ -22,9 +22,10 @@ const query = `CREATE TABLE IF NOT EXISTS users (
 );`;
 // ALTER SEQUENCE users_id_seq RESTART WITH 1`;
 
-const loadSchema = (ctx) => {
+const loadSchema = async (ctx) => {
   const { db } = ctx;
-  return db.none(query).then(() => ctx);
+  await db.none(query);
+  return ctx;
 };
 
 export default loadSchema;

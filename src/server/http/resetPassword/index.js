@@ -3,13 +3,17 @@ import bcrypt from 'bcrypt-as-promised';
 import users from '../../models/users';
 import { schemaResetPassword } from '../../../lib/validator';
 
-const resetPassword = (req, res, next) => {
-  const { password } = req.body;
-  if (Joi.validate(req.body, schemaResetPassword).error) {
-    return next({ details: 'wrong format' });
+const resetPassword = async (ctx) => {
+  try {
+    const { password } = ctx.request.body;
+    if (Joi.validate(ctx.request.body, schemaResetPassword).error) throw (new Error());
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await users.update({ password: hashedPassword }, ctx.id);
+    ctx.status = 200;
+  } catch (err) {
+    ctx.status = err.status || 201;
+    ctx.body = 'failed to authenticate / wrong format';
   }
-  return bcrypt.hash(password, 10)
-      .then(hashedPassword => users.update({ password: hashedPassword }, req.id));
 };
 
 export default resetPassword;

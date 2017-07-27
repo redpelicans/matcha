@@ -6,11 +6,12 @@ import initHttp from '..';
 import config from '../../../../config/server';
 
 describe('http:ping', () => {
-  before(function () {
-    return initHttp({ config, services: { evtx: {} }, models: { users: {} } })
-      .then((ctx) => {
-        this.ctx = ctx;
-      });
+  before(async function () {
+    const ctx = await initHttp({ config, services: { evtx: {} }, models: { users: {} } })
+      // .then((ctx) => {
+        // this.ctx = ctx;
+      // });
+    this.ctx = ctx;
   });
 
   it('should ping', function (done) {

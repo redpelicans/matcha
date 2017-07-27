@@ -55,7 +55,7 @@ const service = {
 
   put({ id: { id }, infoToUpdate }) {
     const { models: { users } } = this.globals;
-    const info = R.filter((single) => {
+    const info = R.filter((single) => { // eslint-disable-line array-callback-return
       if (typeof single === 'object' && single.length !== 0) return true;
       if (typeof single === 'string' && single !== '') return true;
     }, infoToUpdate);

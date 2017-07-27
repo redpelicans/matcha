@@ -73,8 +73,8 @@ class View extends Component {
 
   handleUpdate = (evt) => {
     evt.preventDefault();
-    const { updateUser, matchaToken } = this.props;
-    const { orientation, bio, interest, imgProfile } = this.state;
+    const { updateUser } = this.props;
+    const { orientation, bio, interest } = this.state;
     updateUser({ orientation, bio, interest });
   };
 
@@ -84,7 +84,7 @@ class View extends Component {
     return (
       <div className="register-container">
         <div className="navbar-top-right"><NavLink to="/me" className="button">Account</NavLink></div>
-        { error && <div>{ alert(error)}{window.location.reload()}</div>}
+        { error && <div>{error} {window.location.reload()}</div> }
         <div className="register-form-container" onChange={this.handleChange}>
           <h2>Update your info!</h2>
           <input id="heterosexual" type="radio" name="orientation" value="heterosexual" onClick={this.handleChange} className="float-left" />
@@ -102,11 +102,11 @@ class View extends Component {
           </ul>
           { account && <button type="submit" onClick={this.handleUpdate} className="button" >Update!</button> }
           { !account &&
-            <label htmlFor="file" className="label-file">Choisir une photo de profil</label> &&
-            <input id="file" name="imgProfile" className="input-file" type="file" accept="image/*" /> &&
-            <br />
+            <div><label htmlFor="file" className="label-file">Choisir une photo de profil</label>
+              <input id="file" name="imgProfile" className="input-file" type="file" accept="image/*" />
+              <br /></div>
           }
-          { !account && imgProfile && <button type="submit" onClick={this.handleSubmit} className="button" >Continue!</button> } 
+          { !account && imgProfile && <button type="submit" onClick={this.handleSubmit} className="button" >Continue!</button> }
         </div>
       </div>
     );

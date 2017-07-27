@@ -6,9 +6,10 @@ const query = `CREATE TABLE IF NOT EXISTS likes (
   push BOOLEAN DEFAULT FALSE
 );`;
 
-const loadSchema = (ctx) => {
+const loadSchema = async (ctx) => {
   const { db } = ctx;
-  return db.any(query).then(() => ctx);
+  await db.any(query);
+  return ctx;
 };
 
 export default loadSchema;

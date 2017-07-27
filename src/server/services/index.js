@@ -14,7 +14,8 @@ const allServices = [
 
 const initServices = (api) => allServices.reduce((acc, service) => acc.configure(service), api);
 
-const init = (ctx) => {
+const init = ctx => {
+  // console.log(ctx);
   const evtx = EvtX(ctx).configure(initServices);
   logger('EvtX api setup');
   return Promise.resolve({ ...ctx, services: { evtx } });

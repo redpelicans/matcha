@@ -1,10 +1,12 @@
 import R from 'ramda';
 
-const addImg = (users) => (req, res, next) => {
+const addImg = (users) => async (ctx) => {
+  const { req } = ctx;
   const imgs = {};
-  const { user: { id } } = req;
+  const { user: { id } } = ctx;
   const { imgProfile } = req.files;
   let path = null;
+
   if (req.files.imgs) {
     req.files.imgs.forEach((img, index) => {
       imgs[`photo_${index + 1}`] = `/uploads/${img.filename}`;
@@ -13,11 +15,12 @@ const addImg = (users) => (req, res, next) => {
   if (imgProfile) {
     path = `/uploads/${req.files.imgProfile[0].filename}`;
   }
-  users.addImg(imgs, path, id)
-   .then((data) => {
-     res.json(R.pick(['photo_1', 'photo_2', 'photo_3', 'photo_4', 'photo_5'], data));
-     next();
-   })
-   .catch(() => next({ status: 'error_failed_to_upload' }));
+  try {
+    const data = await users.addImg(imgs, path, id);
+    ctx.body = R.pick(['photo_1', 'photo_2', 'photo_3', 'photo_4', 'photo_5'], data);
+  } catch (err) {
+    ctx.status = 201;
+    ctx.body = 'Failed to authenticate';
+  }
 };
 export default addImg;

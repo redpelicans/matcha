@@ -4,10 +4,16 @@ import run from './run';
 
 const logger = debug('matcha:server/index.js');
 
-run(config)
-  .then(ctx => {
-    const { models: { users } } = ctx;
-    users.on('login', () => logger('login success'));
+const init = async () => {
+  try {
+    const ctx = await run(config);
+    // const { models: { users } } = ctx;
+    // users.on('login', () => logger('login success'));
     logger('Server started!');
-  })
-  .catch(err => logger(err.stack));
+  } catch (err) {
+    console.log('error');
+    logger(err.stack);
+  }
+};
+
+init();
