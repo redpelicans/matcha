@@ -31,6 +31,24 @@ const webpackConfig = {
         exclude: /node_modules/,
         loaders: ['style-loader', 'css-loader'],
       },
+      {
+        test: /\.js$/,
+        exclude: /(node_modules|bower_components)/,
+        use: {
+          loader: 'babel-loader',
+          query: {
+            plugins: [
+                [require('babel-plugin-transform-imports'), {
+                    "redux-form": {
+                        "transform": "redux-form/es/${member}",
+                        },
+                        preventFullImport: true
+                    }
+        ]
+            ]
+          }
+        }
+      },
     ],
   },
   plugins: compact([

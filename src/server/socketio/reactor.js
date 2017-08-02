@@ -33,13 +33,17 @@ const getToken = (ctx) => {
   return Promise.resolve({ ...ctx, matchaToken });
 };
 
-const getUserFromToken = (ctx) => {
-  const { globals: { config: { secretSentence }, models: { users } }, matchaToken, message: { type } } = ctx;
-  if (type === 'users:post' || type === 'users:login') return Promise.resolve(ctx);
+const getUserFromToken = async (ctx) => {
+  const { globals: { config: { secretSentence }, models: { users } }, matchaToken } = ctx;
   if (!matchaToken) return Promise.resolve(ctx);
   const dataDecoded = jwt.verify(matchaToken, secretSentence);
   if (!dataDecoded) return Promise.resolve(ctx);
-  return users.load(dataDecoded.sub).then(user => ({ ...ctx, user }));
+  try {
+    const user = await users.load(dataDecoded.sub);
+    return ({ ...ctx, user });
+  } catch (err) {
+    return ({ ...ctx });
+  }
 };
 
 class Reactor {
@@ -49,6 +53,7 @@ class Reactor {
     this.evtx = evtx;
     this.users = users;
     this.likes = likes;
+    this.socket = {};
     this.sockets = {};
     this.initModels();
     this.initEvtX();
@@ -72,9 +77,16 @@ class Reactor {
     const unLike = ({ from, to }) => {
       logger(from, to);
     };
+
+    const confirmEmail = (user) => {
+      logger('confirmEmail Emitter');
+      this.socket.emit('action', { type: 'confirmEmail', payload: { user } });
+    };
+
     this.users.on('login', registerUser);
     this.users.on('logout', logoutUser);
     this.likes.on('addLike', addLike);
+    this.users.on('confirmEmail', confirmEmail);
     this.likes.on('unLike', unLike);
   }
 
@@ -96,26 +108,31 @@ class Reactor {
   initIo() {
     const { evtx, io } = this;
     io.on('connection', (socket) => {
-      socket.on('action', (message) => {
-        logger(message);
+      this.socket = socket;
+      socket.on('action', (message, cb) => {
         logger(`receive ${message.type} action`);
         const localCtx = { io, socket, usersConnected: this.getConnectedUsers.bind(this) };
         evtx.run(message, localCtx)
           .then((res) => {
-            const connected = this.getConnectedUsers();
-            if (res.type === 'isConnected') {
-              if (connected.includes(res.payload.user.id)) return socket.emit('action', { ...res, payload: { ...res.payload, connected: true } });
-              return socket.emit('action', { ...res, payload: { ...res.payload, connected: false } });
+            if (cb) {
+              logger(`answer ${message.type} action`);
+              return cb(null, res);
             }
-            logger(`sent ${res.type} action`);
-            socket.emit('action', { ...res, payload: { ...res.payload, connected } });
-            // console.log(res);
+
+            // const connected = this.getConnectedUsers();
+            // if (res.type === 'isConnected') {
+            //   if (connected.includes(res.payload.user.id)) return socket.emit('action', { ...res, payload: { ...res.payload, connected: true } });
+            //   return socket.emit('action', { ...res, payload: { ...res.payload, connected: false } });
+            // }
+            logger(`answer ${res.type} action`);
+            socket.emit('action', res);
           })
           .catch((err) => {
             let res = {};
             if (!err.status) {
               res = { status: err.detail, routine: err.routine };
             } else res = { status: err.status };
+            if (cb) return cb(res);
             socket.emit('action', { type: 'EvtX:Error', ...res });
           });
       });

@@ -10,6 +10,11 @@ import { loadProfil, filterBySexeAge, cleanUser, sortGeoLoc, reduceUsers, buildU
 const service = {
   name: 'users',
 
+  checkToken() {
+    const { user } = this;
+    return Promise.resolve({ user });
+  },
+
   logout(user) {
     const { socket } = this.locals;
     const { models: { users } } = this.globals;
@@ -23,7 +28,7 @@ const service = {
       const token = jwt.sign({ sub: user.id }, secretSentence, { expiresIn });
       const { socket } = this.locals;
       users.emit('login', { user, socket });
-      return { matchaToken: token, id: user.id };
+      return { matchaToken: token };
     });
   },
 
@@ -42,6 +47,7 @@ const service = {
       return R.omit('password', userloaded);
     });
   },
+
   delete({ id }) {
     const { models: { users } } = this.globals;
     return users.delete(Number(id));

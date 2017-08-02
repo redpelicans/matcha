@@ -1,0 +1,23 @@
+.home-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.auth-container {
+  display: flex;
+   min-width: 300px; 
+  flex-direction: column;
+  font-size: 1.5vw;
+  text-align: center;
+}
+
+.marger-input {
+  margin: 5px 0 5px 0;
+}
+
+.groupbutton {
+  display: flex;
+  flex-direction: row;
+}
