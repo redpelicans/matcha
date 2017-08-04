@@ -1,6 +1,6 @@
 import { createStructuredSelector, createSelector } from 'reselect';
 import { connect } from 'react-redux';
-import { getUser } from './actions';
+// import { getUser } from './actions';
 import View from './view';
 
 const getState = (state) => state.currentUser;
@@ -10,7 +10,7 @@ const mapStateToProps = createStructuredSelector({
 });
 
 const mapDispatchToProps = {
-  getUser,
+  // getUser,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(View);

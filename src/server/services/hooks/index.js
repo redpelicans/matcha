@@ -9,7 +9,7 @@ export const validateRegisterForm = (ctx) => {
   const { input } = ctx;
   const user = input;
   if (Joi.validate(user, schemaRegister).error) {
-    const { config: { httpCode: { BadRequest } } } = ctx.globals;
+    const { config: { statusCode: { BadRequest } } } = ctx.globals;
     return Promise.reject({ status: BadRequest });
   }
   return Promise.resolve({ ...ctx, input: user });
@@ -19,7 +19,7 @@ export const validateLoginForm = (ctx) => {
   const { input } = ctx;
   const user = input;
   if (Joi.validate(user, schemaLogin).error) {
-    const { config: { httpCode: { BadRequest } } } = ctx.globals;
+    const { config: { statusCode: { BadRequest } } } = ctx.globals;
     return Promise.reject({ status: BadRequest });
   }
   return Promise.resolve({ ...ctx, input: user });
@@ -27,9 +27,10 @@ export const validateLoginForm = (ctx) => {
 
 export const getByEmail = (ctx) => {
   const { globals: { models: { users } }, input: { login, password } } = ctx; // eslint-disable-line no-shadow
+  const { config: { statusCode: { Unauthorized } } } = ctx.globals;
   return users.getByEmail(login)
   .then((user) => {
-    if (!user.confirmed) return Promise.reject({ status: 'Unauthorized' });
+    if (!user.confirmed) return Promise.reject({ status: Unauthorized });
     return Promise.resolve({ ...ctx, input: { user, password } });
   });
 };
@@ -37,7 +38,7 @@ export const checkIfConfirmed = (ctx) => {
   const { globals: { models: { users } }, input: { id } } = ctx; // eslint-disable-line no-shadow
   return users.load(id).then(user => {
     if (user.confirmed) {
-      const { config: { httpCode: { error } } } = ctx.globals;
+      const { config: { statusCode: { error } } } = ctx.globals;
       return Promise.reject({ ...ctx, status: error });
     }
     return Promise.resolve({ ...ctx, input: id });
@@ -48,30 +49,22 @@ export const sendConfirmEmail = (ctx) => {
   // if (process.env.NODE_ENV === 'testing') return Promise.resolve(ctx);
   const {
     input: { email },
-    globals: { config: { secretSentence, expiresIn, server, routes: { confirmEmail } } },
+    globals: { config: { secretSentence, secretPasswordMail, expiresIn, server, routes: { confirmEmail } } },
     output: { id },
   } = ctx;
   const getUrl = `http://${server.host}:${server.port}`;
   const token = jwt.sign({ sub: id }, secretSentence, { expiresIn });
-  mailer(email,
+  mailer(secretPasswordMail, email,
     'Registration - Matcha',
     `Click to confirm your email:  ${getUrl}${confirmEmail}?matchaToken=${token}`);
   return Promise.resolve(ctx);
 };
 
 export const checkAuth = (ctx) => {
-  let matchaToken = '';
-  const {
-    globals: { config: { secretSentence } },
-    locals: { req },
-  } = ctx;
-  const { config: { httpCode: { Unauthorized } } } = ctx.globals;
-  if (!req) matchaToken = ctx.matchaToken;
-  else matchaToken = req.matchaToken;
-  if (!matchaToken) return Promise.reject({ status: Unauthorized });
-  const tokenDataDecoded = jwt.verify(matchaToken, secretSentence);
-  if (!tokenDataDecoded) return Promise.reject({ status: Unauthorized });
-  return Promise.resolve({ ...ctx, input: { idUser: ctx.input, id: tokenDataDecoded.sub, user: ctx.user } });
+  const { config: { statusCode: { Unauthorized } } } = ctx.globals;
+  const { user } = ctx;
+  if (!user) return Promise.reject({ status: Unauthorized });
+  return Promise.resolve({ ...ctx, input: user });
 };
 
 export const getInfoToUpdate = (ctx) => {

@@ -1,4 +1,4 @@
-import { SET_TOASTER } from '../components/toaster/actions';
+import { SET_TOASTER } from '../actions/toaster';
 import { EVTX_ERROR } from '../store/middlewares';
 
 const initialState = {

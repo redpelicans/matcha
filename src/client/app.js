@@ -3,11 +3,10 @@ import { withRouter, Switch, Route } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import routes, { defaultRoute } from './routes';
-import { logout } from './components/login/actions';
+import { logout } from './actions/login';
 import Header from './containers/headers';
 import { Auth } from './kontrolo';
 import MyToaster from './components/toaster';
-
 
 const makeAuthRoute = route => (props) => {
   if (route.auth) {
@@ -21,7 +20,6 @@ const makeAuthRoute = route => (props) => {
 };
 
 const App = ({ logout }) => {
-  // const handleClick = () => history.push(`/people/${user._id}`);
   const handleLogout = () => logout();
   return (
     <div>

@@ -1,24 +1,22 @@
 import R from 'ramda';
-import { push, goBack } from '../history';
-import { USER_LOGGED } from '../components/login/actions';
+import { USER_LOGGED } from '../actions/login';
 
 const CONFIRM_EMAIL = 'confirmEmail';
 export const EVTX_ERROR = 'EvtX:Error';
 
-export const socketIoMiddleWare = socket => ({ dispatch, getState }) => {
+export const socketIoMiddleWare = (socket, history) => ({ dispatch, getState }) => {
   socket.on('action', action => {
     if (!action || !action.type) return;
     switch (action.type) {
       case CONFIRM_EMAIL:
-        return push('/login');
+        return history.push('/login');
       case USER_LOGGED:
         localStorage.setItem('matchaToken', action.payload.matchaToken);
-        dispatch(action);
-        return goBack();
+        return dispatch(action);
       case EVTX_ERROR:
         switch (action.status) {
           case 201:
-            return push('/login');
+            return history.push('/login');
           default:
             return dispatch(action);
         }
@@ -40,4 +38,6 @@ export const socketIoMiddleWare = socket => ({ dispatch, getState }) => {
   };
 };
 
-export const logMiddleware = () => (next) => (action) => (next(action));
+export const logMiddleware = ({ getState }) => (next) => (action) => {
+  next(action);
+};

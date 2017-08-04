@@ -1,4 +1,4 @@
-import { USER_SUGGESTED } from '../components/suggestion/actions';
+import { USER_SUGGESTED } from '../actions/suggestion';
 
 const initialState = {
   users: [],

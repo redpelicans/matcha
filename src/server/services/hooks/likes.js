@@ -3,7 +3,7 @@ import likes from '../../models/likes';
 
 export const ifAlreadyLiked = (ctx) => {
   const { idUser: { from, to } } = ctx.input;
-  const { config: { httpCode: { error } } } = ctx.globals;
+  const { config: { statusCode: { error } } } = ctx.globals;
   return likes.load(from, to)
   .then(() => ctx)
   .catch(() => Promise.reject({ status: error }));
@@ -12,7 +12,7 @@ export const ifAlreadyLiked = (ctx) => {
 export const ifCanLike = (ctx) => {
   const { idUser: { from, to } } = ctx.input;
   if (from !== to) return Promise.resolve(ctx);
-  const { config: { httpCode: { error } } } = ctx.globals;
+  const { config: { statusCode: { error } } } = ctx.globals;
   return Promise.reject({ status: error });
 };
 

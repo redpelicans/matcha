@@ -69,7 +69,7 @@ describe('functional', () => {
       age: '21',
     };
     const message = {
-      type: 'users:post',
+      type: 'users:add',
       payload: user,
       replyTo: 'addedUser',
     };
@@ -103,10 +103,10 @@ describe('functional', () => {
       email: 'barrielle@gmail.com',
     };
     const message = {
-      type: 'users:put',
+      type: 'users:updateInfos',
       payload: infoToUpdate,
       matchaToken: this.matchaToken,
-      replyTo: 'put',
+      replyTo: 'updateInfos',
     };
     const io = socketIOClient.connect(this.url);
     io.emit('action', message);
@@ -127,9 +127,9 @@ describe('functional', () => {
       age: '21',
     };
     const message = {
-      type: 'users:post',
+      type: 'users:add',
       payload: user,
-      replyTo: 'post',
+      replyTo: 'add',
     };
     const io = socketIOClient.connect(this.url);
     io.emit('action', message);
@@ -183,7 +183,7 @@ describe('functional', () => {
     const message = {
       type: 'users:login',
       payload: data,
-      replyTo: 'put',
+      replyTo: 'updateInfos',
     };
     const io = socketIOClient.connect(this.url);
     io.emit('action', message);

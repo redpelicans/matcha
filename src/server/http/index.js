@@ -42,6 +42,7 @@ const init = ctx => new Promise(resolve => {
     .use(cors())
     .use(router.routes())
     .use(router.allowedMethods());
+
   const httpServer = app.listen(port, host, () => {
     httpServer.url = getUrl(httpServer);
     console.log(`Connected ${httpServer.url}`); // eslint-disable-line no-console

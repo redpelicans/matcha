@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector, createSelector } from 'reselect';
+import { Redirect } from 'react-router';
 import { PropTypes } from 'prop-types';
-import { withRouter } from 'react-router-dom';
-import { setToaster } from '../toaster/actions';
-import { addUserForm, addUserInBack } from './actions';
+import { setToaster } from '../../actions/toaster';
+import { addUserForm, addUserInBack } from '../../actions/register';
 import WizardFirstPage from './wizardfirst';
+import { defaultRoute } from '../../routes';
 import WizardSecondPage from './wizardsecond';
 import WizardThirdPage from './wizardthird';
 import Spinner from '../../containers/spinner';
-import { defaultRoute } from '../../routes';
 import './register.css';
 
 class Register extends Component {
@@ -19,21 +19,16 @@ class Register extends Component {
     page: 1,
   }
 
-  componentWillMount() {
-    const { user, history } = this.props;
-    if (user) history.replace(defaultRoute().path);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const { user } = nextProps;
-    const { setToaster } = this.props;
-    const { showToaster } = this.state;
-    if (!user) return null;
-    if (!user.confirmed && user.status === 'response' && showToaster) {
-      this.setState({ showToaster: false });
-      setToaster({ message: 'Please check your email for confirmation', intent: 'success' });
-    }
-  }
+  // componentWillReceiveProps(nextProps) {
+  //   const { user } = nextProps;
+  //   const { setToaster } = this.props;
+  //   const { showToaster } = this.state;
+  //   if (!user) return null;
+  //   if (!user.confirmed && user.status === 'response' && showToaster) {
+  //     this.setState({ showToaster: false });
+  //     setToaster({ message: 'Please check your email for confirmation', intent: 'success' });
+  //   }
+  // }
 
   handleSubmit = (user) => {
     const { addUserForm, addUserInBack } = this.props;
@@ -54,6 +49,8 @@ class Register extends Component {
   render() {
     const { page } = this.state;
     const { status } = this.props.user || {};
+    const { user } = this.props;
+    if (user) return <Redirect to={defaultRoute().path} />;
     return (
       <div>
         <div className="home-container">
@@ -71,7 +68,6 @@ Register.propTypes = {
   addUserForm: PropTypes.func.isRequired,
   addUserInBack: PropTypes.func.isRequired,
   setToaster: PropTypes.func.isRequired,
-  history: PropTypes.object.isRequired,
   user: PropTypes.object,
 };
 
@@ -91,4 +87,4 @@ const mapDispatchToProps = {
   addUserInBack,
 };
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Register));
+export default connect(mapStateToProps, mapDispatchToProps)(Register);

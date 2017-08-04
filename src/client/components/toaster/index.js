@@ -3,7 +3,7 @@ import { createStructuredSelector, createSelector } from 'reselect';
 import PropTypes from 'prop-types';
 import { Toaster, Intent } from '@blueprintjs/core';
 import { connect } from 'react-redux';
-import { setToaster } from './actions';
+import { setToaster } from '../../actions/toaster';
 
 class MyToaster extends Component {
 

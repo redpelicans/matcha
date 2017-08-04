@@ -28,21 +28,25 @@ const formatResponse = (ctx) => {
   return Promise.resolve(ctx);
 };
 
-const getToken = (ctx) => {
+export const getToken = (ctx) => {
   const { message: { matchaToken } } = ctx;
   return Promise.resolve({ ...ctx, matchaToken });
 };
 
-const getUserFromToken = async (ctx) => {
-  const { globals: { config: { secretSentence }, models: { users } }, matchaToken } = ctx;
+export const getUserFromToken = async (ctx) => {
+  const { globals: { config: { statusCode: { WrongToken }, secretSentence }, models: { users } }, matchaToken } = ctx;
   if (!matchaToken) return Promise.resolve(ctx);
-  const dataDecoded = jwt.verify(matchaToken, secretSentence);
-  if (!dataDecoded) return Promise.resolve(ctx);
   try {
-    const user = await users.load(dataDecoded.sub);
-    return ({ ...ctx, user });
+    const dataDecoded = jwt.verify(matchaToken, secretSentence);
+    if (!dataDecoded) return Promise.resolve(ctx);
+    try {
+      const user = await users.load(dataDecoded.sub);
+      return ({ ...ctx, user });
+    } catch (err) {
+      return ({ ...ctx });
+    }
   } catch (err) {
-    return ({ ...ctx });
+    return Promise.reject({ status: WrongToken, message: 'WrongToken' });
   }
 };
 
@@ -118,7 +122,6 @@ class Reactor {
               logger(`answer ${message.type} action`);
               return cb(null, res);
             }
-
             // const connected = this.getConnectedUsers();
             // if (res.type === 'isConnected') {
             //   if (connected.includes(res.payload.user.id)) return socket.emit('action', { ...res, payload: { ...res.payload, connected: true } });
@@ -128,10 +131,8 @@ class Reactor {
             socket.emit('action', res);
           })
           .catch((err) => {
-            let res = {};
-            if (!err.status) {
-              res = { status: err.detail, routine: err.routine };
-            } else res = { status: err.status };
+            console.error(err);
+            const res = { message: err.message || err.toString(), status: err.status };
             if (cb) return cb(res);
             socket.emit('action', { type: 'EvtX:Error', ...res });
           });

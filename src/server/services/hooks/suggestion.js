@@ -11,12 +11,9 @@ const whichSexe = (sexe, orientation) => {
 const whichAge = (age, range) => ([Number(age) - range, Number(age) + range]);
 
 export const loadProfil = (ctx) => {
-  const { globals: { models: { users } }, input: { id } } = ctx;
-  const { config: { httpCode: { Unauthorized } } } = ctx.globals;
-  return users.load(id).then(user => {
-    if (!user || !user.confirmed) return Promise.reject({ status: Unauthorized });
-    const lookingFor = {};
-    const { sexe,
+  const { user } = ctx;
+  const lookingFor = {};
+  const { sexe,
       orientation,
       age,
       interest,
@@ -25,16 +22,15 @@ export const loadProfil = (ctx) => {
       city,
       country,
     } = user;
-    lookingFor.mySexe = sexe;
-    lookingFor.sexe = whichSexe(sexe, orientation);
-    lookingFor.age = whichAge(age, 10);
-    lookingFor.interest = interest;
-    lookingFor.longitude = longitude;
-    lookingFor.latitude = latitude;
-    lookingFor.country = country;
-    lookingFor.city = city;
-    return Promise.resolve({ ...ctx, input: lookingFor });
-  });
+  lookingFor.mySexe = sexe;
+  lookingFor.sexe = whichSexe(sexe, orientation);
+  lookingFor.age = whichAge(age, 10);
+  lookingFor.interest = interest;
+  lookingFor.longitude = longitude;
+  lookingFor.latitude = latitude;
+  lookingFor.country = country;
+  lookingFor.city = city;
+  return Promise.resolve({ ...ctx, input: lookingFor });
 };
 
 export const filterBySexeAge = (ctx) => {

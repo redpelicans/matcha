@@ -5,7 +5,7 @@ module.exports = {
   secret: {
     path: path.join(__dirname, '../../etc/secret.js'),
   },
-  httpCode: {
+  statusCode: {
     Unauthorized: 201, // 401
     BadRequest: 202,  //  400
     Forbidden: 203,    // 403

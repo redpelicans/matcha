@@ -11,7 +11,7 @@ const RenderField = ({ input, placeholder, type, meta: { touched, error } }) =>
       className={` pt-fill pt-input marger-input pt-round ${error && touched ? 'pt-intent-warning warning-input' : ''} `}
     />
     {
-      touched && error && <span className="pt-tag pt-intent-warning flex"> {error} </span>
+      touched && error && <span className="pt-tag pt-intent-danger flex"> {error} </span>
     }
   </div>;
 

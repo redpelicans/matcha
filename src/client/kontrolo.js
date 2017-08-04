@@ -7,8 +7,8 @@ class Kontrolo extends React.Component {
 
   constructor(props) {
     super(props);
-    const { user, isAuthorized, redirect, history } = this.props;
-    this.user = user;
+    const { user, isAuthorized, redirect, history, state } = this.props;
+    this.user = user(state);
     this.redirectTo = redirect;
     this.history = history;
     this.isAuthorized = () => isAuthorized(this.user);
@@ -26,7 +26,7 @@ class Kontrolo extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.user = nextProps.user;
+    this.user = nextProps.user(nextProps.state);
   }
 
   render() {
@@ -43,17 +43,15 @@ Kontrolo.childContextTypes = {
 
 Kontrolo.propTypes = {
   children: PropTypes.element.isRequired,
-  user: PropTypes.object,
+  user: PropTypes.func,
   isAuthorized: PropTypes.func.isRequired,
   redirect: PropTypes.string.isRequired,
   history: PropTypes.object.isRequired,
+  state: PropTypes.object.isRequired,
+
 };
 
-Kontrolo.defaultProps = {
-  user: null,
-};
-
-const mapStateToProps = state => ({ user: state.currentUser.user });
+const mapStateToProps = state => ({ state });
 
 export default withRouter(connect(mapStateToProps)(Kontrolo));
 

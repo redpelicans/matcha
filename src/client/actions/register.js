@@ -1,5 +1,5 @@
 export const ADD_USER_FORM = 'addUserForm';
-export const ADD_USER_BACK = 'evtx:server:users:post';
+export const ADD_USER_BACK = 'evtx:server:users:add';
 export const USER_ADDED = 'userAdded';
 
 export const addUserForm = (user) => ({ type: ADD_USER_FORM, payload: user });

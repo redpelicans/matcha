@@ -9,7 +9,8 @@ import Kontrolo from './kontrolo';
 import history from './history';
 import configureStore from './store';
 import App from './app';
-import { checkToken, userLogged } from './components/login/actions';
+import { checkToken, userLogged, logout } from './actions/login';
+import config from '../../config/server/development';
 
 FocusStyleManager.onlyShowFocusOnTabs();
 const mountNode = window.document.getElementById('__MATCHA__');
@@ -20,13 +21,9 @@ io.on('disconnect', () => console.log('socket.io disconnected ...')); // eslint-
 io.on('error', err => console.log(`socket.io error: ${err}`)); // eslint-disable-line no-console
 
 const matchaToken = localStorage.getItem('matchaToken');
-const initialState = {
-  currentUser: {
-    matchaToken,
-  },
-};
+const initialState = { currentUser: { matchaToken } };
 
-const store = configureStore(initialState, io);
+const store = configureStore(initialState, io, history);
 
 const isAuthorized = (user) => {
   console.log(user);  // eslint-disable-line no-console
@@ -44,12 +41,18 @@ const Root = (
   </Provider>
 );
 
+const { statusCode } = config;
+
 io.on('connect', () => {
   console.log('socket.io connected.'); // eslint-disable-line no-console
   if (matchaToken) {
-    store.dispatch(checkToken((err, { user, matchaToken } = { }) => {
-      if (err) console.log(err.message); // eslint-disable-line no-console
-      else {
+    store.dispatch(checkToken((err, { user } = { }) => {
+      if (err) {
+        console.log(`EvtX:Error => ${err.message}`); // eslint-disable-line no-console
+        if (err.status === statusCode.WrongToken) {
+          store.dispatch(logout());
+        }
+      } else {
         store.dispatch(userLogged(user, matchaToken));
       }
       render(Root, mountNode);

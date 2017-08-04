@@ -1,31 +1,8 @@
-import React, { Component } from 'react';
-
-const asyncComponent = (getComponent) =>
-  class AsyncComponent extends Component {
-    static Component = null;
-    state = { Component: AsyncComponent.Component };
-
-    componentWillMount() {
-      const { Component } = this.state;
-      if (!Component) {
-        getComponent().then(Component => {
-          AsyncComponent.Component = Component;
-          this.setState({ Component });
-        });
-      }
-    }
-
-    render() {
-      const { Component } = this.state;
-      if (!Component) return null;
-      return <Component {...this.props} />;
-    }
-};
-
-const Login = asyncComponent(() => import('./components/login').then(module => module.default));
-const Register = asyncComponent(() => import('./components/register').then(module => module.default));
-const Account = asyncComponent(() => import('./components/me').then(module => module.default));
-const Suggestion = asyncComponent(() => import('./components/suggestion').then(module => module.default));
+import Login  from './components/login';
+import Register from './components/register';
+import Account from './components/me';
+import AboutMe from'./components/aboutme';
+import Suggestion from './components/suggestion';
 
 const routes = [
   {
@@ -43,7 +20,6 @@ const routes = [
   {
     path: '/me',
     exact: true,
-    default: true,
     auth: true,
     component: Account,
   },
@@ -51,6 +27,12 @@ const routes = [
     path: '/register',
     exact: true,
     component: Register,
+  },
+  {
+    path: '/about_me',
+    exact: true,
+    auth: true,
+    component: AboutMe,
   },
 ];
 

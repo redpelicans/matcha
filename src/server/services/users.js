@@ -15,37 +15,45 @@ const service = {
     return Promise.resolve({ user });
   },
 
-  logout(user) {
+  logout() {
+    const { user } = this;
     const { socket } = this.locals;
     const { models: { users } } = this.globals;
     users.emit('logout', { user, socket });
+    return Promise.resolve({ id: user.id });
   },
 
-  login({ user, password }) {
-    const { models: { users } } = this.globals;
-    return bcrypt.compare(password, user.password).then(() => {
+  async login({ user, password }) {
+    try {
+      const { models: { users } } = this.globals;
       const { globals: { config: { secretSentence }, expiresIn } } = this;
+      await bcrypt.compare(password, user.password);
       const token = jwt.sign({ sub: user.id }, secretSentence, { expiresIn });
       const { socket } = this.locals;
       users.emit('login', { user, socket });
       return { matchaToken: token };
-    });
+    } catch (err) {
+      const { config: { statusCode: { Unauthorized } } } = this.globals;
+      return Promise.reject({ status: Unauthorized, message: 'Bad Password' });
+    }
   },
 
-  get({ id }) {
+  get() {
+    const { user: { id } } = this;
     const { models: { users } } = this.globals;
     return users.load(Number(id)).then((userLoad) => R.omit('password', userLoad));
   },
 
   getUser({ idUser, user }) {
-    const { models: { users } } = this.globals;
-    return users.load(Number(idUser)).then((userLoad) => {
-      const distance = geolib.getDistance(
-        { latitude: userLoad.latitude, longitude: userLoad.longitude },
-        { latitude: user.latitude, longitude: user.longitude });
-      const userloaded = { ...userLoad, distance };
-      return R.omit('password', userloaded);
-    });
+   // Need to clean this one
+    // const { models: { users } } = this.globals;
+    // return users.load(Number(idUser)).then((userLoad) => {
+    //   const distance = geolib.getDistance(
+    //     { latitude: userLoad.latitude, longitude: userLoad.longitude },
+    //     { latitude: user.latitude, longitude: user.longitude });
+    //   const userloaded = { ...userLoad, distance };
+    //   return R.omit('password', userloaded);
+    // });
   },
 
   delete({ id }) {
@@ -53,13 +61,19 @@ const service = {
     return users.delete(Number(id));
   },
 
-  post(user) {
+  async add(user) {
     const { models: { users } } = this.globals;
-    return bcrypt.hash(user.password, 10)
-    .then(hashedPassword => users.add(R.assoc('password', hashedPassword, user)));
+    try {
+      const hashedPassword = await bcrypt.hash(user.password, 10);
+      await users.add(R.assoc('password', hashedPassword, user));
+    } catch (err) {
+      const { config: { statusCode: { BadRequest } } } = this.globals;
+      return Promise.reject({ status: BadRequest, message: 'Failed to register' });
+    }
   },
 
-  put({ id: { id }, infoToUpdate }) {
+  updateInfos({ id: { id }, infoToUpdate }) {
+    // console.log(this);
     const { models: { users } } = this.globals;
     const info = R.filter((single) => { // eslint-disable-line array-callback-return
       if (typeof single === 'object' && single.length !== 0) return true;
@@ -84,16 +98,16 @@ const init = (evtx) => evtx
   .before({
     logout: [checkAuth],
     login: [validateLoginForm, getByEmail],
-    suggestion: [checkAuth, loadProfil, filterBySexeAge, cleanUser, sortGeoLoc, reduceUsers, buildUsers],
+    suggestion: [checkAuth, loadProfil, filterBySexeAge, cleanUser, sortGeoLoc, reduceUsers, buildUsers], // done
     get: [checkAuth],
     getUser: [checkAuth],
-    post: [validateRegisterForm, getIp, getLocalisation],
-    put: [checkAuth, getInfoToUpdate],
+    add: [validateRegisterForm, getIp, getLocalisation],
+    updateInfos: [checkAuth, getInfoToUpdate],
     delete: [getToken, checkAuth],
     isCheckAndConnected: [getToken, checkAuth],
   })
   .after({
-    post: [sendConfirmEmail],
+    add: [sendConfirmEmail],
   });
 
 export default init;
